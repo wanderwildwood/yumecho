@@ -50,3 +50,22 @@ private fun length(seconds: Int): String =
         val minutes = (seconds + 30) / 60
         pluralStringResource(R.plurals.duration_minutes, minutes, minutes)
     }
+
+/** [length], for the saved file, which is written outside any screen. */
+private fun length(context: Context, seconds: Int): String =
+    if (seconds < 60) {
+        context.resources.getQuantityString(R.plurals.duration_seconds, seconds, seconds)
+    } else {
+        val minutes = (seconds + 30) / 60
+        context.resources.getQuantityString(R.plurals.duration_minutes, minutes, minutes)
+    }
+
+/** "Night of Friday 25 September 2026": the file is kept for years, so it carries the year. */
+fun nightHeadingInFile(context: Context, night: LocalDate): String {
+    val pattern = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMMyyyy")
+    return context.getString(R.string.night_of, night.format(DateTimeFormatter.ofPattern(pattern)))
+}
+
+/** "03:12 · 2 minutes", for the saved file. */
+fun timeAndLengthInFile(context: Context, dream: Dream): String =
+    context.getString(R.string.time_and_length, clock(context, dream), length(context, dream.seconds))

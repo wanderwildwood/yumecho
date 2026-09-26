@@ -43,6 +43,15 @@ Deleting a dream deletes both files. Uninstalling the app deletes all of them.
 
 `android:allowBackup="false"` is set, so none of it goes to a cloud backup.
 
+## Saving the words to a file
+
+"Save the words to a file", at the foot of the log, writes every dream's words into one text
+file, in a place you choose with the phone's own save screen: Downloads, say, so you can copy it
+to a computer. It holds what was heard and when, but not the recordings. Once saved, that file
+is outside the app, and deleting a dream or uninstalling the app does not delete it. The app
+writes it only when you press the row, and it needs no permission to do it, because you pick
+the place yourself.
+
 ## No third-party services
 
 No analytics, no advertising, no crash reporting. The dependencies are AndroidX and Jetpack

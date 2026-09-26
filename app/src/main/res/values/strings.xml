@@ -27,6 +27,15 @@
 
     <string name="log_empty">No dreams yet.</string>
 
+    <!-- At the foot of the log: writes every dream's words into one file (verb phrase) -->
+    <string name="log_export">Save the words to a file</string>
+    <!-- Under it, before it is pressed -->
+    <string name="log_export_what">Every dream in one text file, oldest first, to copy to a computer and write up. It holds what was heard and when, but not the recordings.</string>
+    <!-- Under it, once the file is written -->
+    <string name="log_export_saved">Saved.</string>
+    <!-- Under it, when the file could not be written -->
+    <string name="log_export_failed">The file could not be written. Nothing was saved.</string>
+
     <!-- A heading over one night's dreams. %1$s is a date, e.g. "Friday 25 September" -->
     <string name="night_of">Night of %1$s</string>
 

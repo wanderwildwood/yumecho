@@ -33,6 +33,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
+import com.wanderwildwood.yumecho.dreams.paragraphs
 import kotlinx.coroutines.delay
 
 /**
@@ -98,12 +99,6 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
         }
     }
 }
-
-/** Whisper's text, three sentences to a paragraph. It has no paragraphs of its own. */
-private fun paragraphs(text: String): List<String> =
-    text.split(Regex("(?<=[.!?])\\s+"))
-        .filter { it.isNotBlank() }
-        .chunked(3) { it.joinToString(" ") }
 
 @Composable
 private fun Playback(dream: Dream) {

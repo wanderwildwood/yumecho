@@ -49,6 +49,8 @@ fun LogScreen(
     onDisarm: () -> Unit,
     onOpen: (Dream) -> Unit,
     onAbout: () -> Unit,
+    exported: Boolean?,
+    onExport: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -88,6 +90,7 @@ fun LogScreen(
                             item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
                         }
                     }
+                    item(key = "export") { ExportRow(exported, onExport) }
                 }
             }
         }
@@ -134,6 +137,38 @@ private fun DreamRow(dream: Dream, hearing: String?, onOpen: (Dream) -> Unit) {
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * Last in the list, after the oldest night, where it is found by someone looking for it and
+ * is not in the way of the morning's reading. [exported] is null before it is pressed, then
+ * whether the file was written.
+ */
+@Composable
+private fun ExportRow(exported: Boolean?, onExport: () -> Unit) {
+    Column {
+        Spacer(Modifier.height(16.dp))
+        HorizontalDividerMMD()
+        TextMMD(
+            text = stringResource(R.string.log_export),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onExport)
+                .padding(top = 16.dp, bottom = 6.dp),
+        )
+        TextMMD(
+            text = stringResource(
+                when (exported) {
+                    null -> R.string.log_export_what
+                    true -> R.string.log_export_saved
+                    false -> R.string.log_export_failed
+                },
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(bottom = 16.dp),
         )
     }
 }
