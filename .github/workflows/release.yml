@@ -38,7 +38,8 @@ jobs:
       # The native code is built with the NDK the build box has, so an APK from here and one
       # from there are compiled alike.
       - name: Install the NDK
-        run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;24.0.8215888" "cmake;3.22.1" > /dev/null
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;24.0.8215888" "cmake;3.22.1" > /dev/null
 
       # The Whisper model is not in the repository. fetch.sh downloads it and refuses it unless
       # it is byte for byte the model this release was tested with, and the build checks the
