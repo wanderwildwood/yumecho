@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- To record what you say. The recordings are written to the app's own storage and
+         turned into words on the phone; there is no INTERNET permission, so nothing it
+         hears can leave the phone even by accident. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Armed for the night is a foreground service: it has to keep hearing the volume
+         keys, and keep the microphone, with the screen off and the phone locked. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- One buzz when it starts recording and two when it stops, which is all the feedback
+         there is: nothing lights the screen at night. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Keeps the processor, never the screen, awake while it records and transcribes. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.App">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".night.ArmService"
+            android:exported="false"
+            android:foregroundServiceType="microphone|mediaPlayback" />
+
+    </application>
+
+</manifest>

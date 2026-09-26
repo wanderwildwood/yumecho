@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dream Log</string>
+
+    <!-- ============================================================ -->
+    <!-- The log: the one main screen -->
+
+    <!-- Top bar title: the app's name -->
+    <string name="log_title">Dream Log</string>
+    <!-- Info button in the top bar, read aloud by a screen reader -->
+    <string name="log_cd_about">About</string>
+
+    <!-- The button that starts listening for the night (verb) -->
+    <string name="log_arm">Arm for the night</string>
+    <!-- Under the arm button, before arming -->
+    <string name="log_how">Then, if you wake from a dream, press a volume key and say it. One buzz means it is listening. Press again, or stop talking, and two buzzes mean it has stopped.</string>
+    <!-- While armed -->
+    <string name="log_armed">Armed. Press a volume key to record.</string>
+    <string name="log_recording">Recording.</string>
+    <!-- The button that stops listening (verb) -->
+    <string name="log_disarm">Disarm</string>
+
+    <!-- Before the microphone permission is granted -->
+    <string name="log_mic_why">Dream Log needs the microphone to record what you say. The recordings stay on this phone; the app has no way to reach the network.</string>
+    <!-- Button that asks for the microphone permission (verb) -->
+    <string name="log_allow">Allow</string>
+
+    <string name="log_empty">No dreams yet.</string>
+
+    <!-- A heading over one night's dreams. %1$s is a date, e.g. "Friday 25 September" -->
+    <string name="night_of">Night of %1$s</string>
+
+    <!-- A dream in the list, before its words are known -->
+    <string name="dream_waiting">Not heard yet</string>
+    <string name="dream_hearing">Being heard now</string>
+    <!-- A recording in which nothing louder than the room was picked up -->
+    <string name="dream_nothing">Nothing said</string>
+
+    <!-- How long a recording is. %1$d is a number -->
+    <plurals name="duration_seconds">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <!-- A time or a night, and how long, on one line, e.g. "03:12 · 2 minutes" or "Night of Friday 25 September · 2 minutes" -->
+    <string name="time_and_length">%1$s · %2$s</string>
+
+    <!-- ============================================================ -->
+    <!-- One dream -->
+
+    <!-- Top bar button, read aloud by a screen reader -->
+    <string name="dream_cd_close">Close</string>
+    <!-- Under the words: the transcript is the phone's guess, and the recording is what was said -->
+    <string name="dream_mishears">Heard by the phone, which mishears. The recording is the real one.</string>
+    <!-- Play and pause the recording (verbs) -->
+    <string name="dream_play">Play</string>
+    <string name="dream_pause">Pause</string>
+    <string name="dream_delete">Delete this dream</string>
+    <!-- The same row after one tap: a second tap deletes -->
+    <string name="dream_delete_confirm">Delete — tap again</string>
+
+    <!-- ============================================================ -->
+    <!-- The notification shown while armed -->
+
+    <!-- The notification channel's name, in the phone's notification settings -->
+    <string name="channel_armed">Armed</string>
+    <string name="notification_armed">Armed for the night</string>
+    <string name="notification_armed_how">Press a volume key to record a dream</string>
+
+    <!-- ============================================================ -->
+    <!-- About dialog. Keep the names of the app, projects and licences as they are -->
+
+    <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
+    <string name="about_title">Dream Log %1$s</string>
+    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it. The app has no way to reach the network.</string>
+    <!-- The name of the app's licence -->
+    <string name="about_licence">GNU General Public License v3</string>
+    <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
+    <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
+    <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
+    <string name="about_feed_the_llamas">Feed the llamas</string>
+    <!-- Said when the phone has nothing that can open a web address -->
+    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+    <!-- Button that closes the About dialog -->
+    <string name="about_close">Close</string>
+</resources>
