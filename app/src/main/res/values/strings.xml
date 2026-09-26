@@ -81,7 +81,7 @@
     <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
     <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
-    <string name="about_feed_the_llamas">Feed the llamas</string>
+    <string name="about_feed_the_llamas">feed the llamas</string>
     <!-- Said when the phone has nothing that can open a web address -->
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <!-- Button that closes the About dialog -->
