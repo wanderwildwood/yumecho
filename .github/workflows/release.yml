@@ -80,7 +80,7 @@ jobs:
       # every other wrong key and for an unsigned build, which is why it is not used here.
       - name: Verify the signing certificate
         env:
-          EXPECTED: SET-WHEN-THE-KEY-EXISTS
+          EXPECTED: 6ce096a3c48c12e1ef0d158e0d4eb3a8c355c74be8ac84c92697de2d84f9f62f
         run: |
           apk=$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk')
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
