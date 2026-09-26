@@ -18,7 +18,7 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 
 ## Where this is up to
 
-Version 0.1.1. Every screen has been driven on an emulator, and the speech recognition has
+Version 0.1.2. Every screen has been driven on an emulator, and the speech recognition has
 been timed on a Kompakt: a minute of speech takes about half a minute to write down.
 
 ## How it works
@@ -33,6 +33,9 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
 - **In the morning** the log shows each night's dreams, and each one keeps its recording. The
   phone mishears, especially someone half asleep, and the recording is the real one.
 - It disarms itself after twelve hours.
+- **To write them up**, "Save the words to a file" at the foot of the log saves every dream in
+  one Markdown file, oldest night first, to copy to a computer. The recordings stay on the
+  phone.
 
 There are no settings.
 
