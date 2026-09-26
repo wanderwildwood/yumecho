@@ -18,13 +18,8 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 
 ## Where this is up to
 
-Version 0.1.0. Every screen has been driven on an emulator, and the speech recognition has
+Version 0.1.1. Every screen has been driven on an emulator, and the speech recognition has
 been timed on a Kompakt: a minute of speech takes about half a minute to write down.
-
-**It has not yet been used through a night.** A volume key reaching an app while the screen is
-off and the phone locked is the part that depends on the phone rather than on this code, and
-it has only been tried with the screen on. If you take it to bed, what happened in the morning
-is the most useful thing you could send back.
 
 ## How it works
 
