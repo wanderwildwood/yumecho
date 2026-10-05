@@ -17,6 +17,18 @@
     <!-- Keeps the processor, never the screen, awake while it records and transcribes. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <queries>
+        <!-- Lets the menu over a dream's words list other apps' text actions, such as Define
+             from the Dictionary. Without it Android 11+ hides them from this app. -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+        <!-- Notes, for "Keep dreams in Notes": its provider is invisible to this app without
+             this. Notes does any syncing; this app still has no network permission. -->
+        <package android:name="com.wanderwildwood.oboegaki" />
+    </queries>
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

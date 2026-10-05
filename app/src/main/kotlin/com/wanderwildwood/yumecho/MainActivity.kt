@@ -21,10 +21,12 @@ import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.exportText
 import com.wanderwildwood.yumecho.hearing.Transcriber
 import com.wanderwildwood.yumecho.night.ArmService
+import com.wanderwildwood.yumecho.notes.InNotes
 import com.wanderwildwood.yumecho.night.Night
 import com.wanderwildwood.yumecho.ui.AboutDialog
 import com.wanderwildwood.yumecho.ui.DreamScreen
 import com.wanderwildwood.yumecho.ui.LogScreen
+import com.wanderwildwood.yumecho.ui.SettingsScreen
 import com.wanderwildwood.yumecho.ui.monochrome
 import com.wanderwildwood.yumecho.ui.nightHeadingInFile
 import com.wanderwildwood.yumecho.ui.timeAndLengthInFile
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Dreams.init(this)
+        InNotes.init(this)
         setContent {
             ThemeMMD(colorScheme = monochrome) {
                 DreamLog()
@@ -65,6 +68,7 @@ private fun DreamLog() {
     val hearing by Transcriber.hearing.collectAsStateWithLifecycle()
     var open by remember { mutableStateOf<String?>(null) }
     var aboutOpen by remember { mutableStateOf(false) }
+    var settingsOpen by remember { mutableStateOf(false) }
     var micAllowed by remember {
         mutableStateOf(context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
     }
@@ -97,7 +101,10 @@ private fun DreamLog() {
     }
 
     val dream = dreams.firstOrNull { it.stamp == open }
-    if (dream != null) {
+    if (settingsOpen) {
+        BackHandler { settingsOpen = false }
+        SettingsScreen(onBack = { settingsOpen = false })
+    } else if (dream != null) {
         BackHandler { open = null }
         DreamScreen(
             dream = dream,
@@ -119,6 +126,7 @@ private fun DreamLog() {
             },
             onDisarm = { ArmService.disarm(context) },
             onOpen = { open = it.stamp },
+            onSettings = { settingsOpen = true },
             onAbout = { aboutOpen = true },
             exported = exported,
             onExport = { export.launch("dreams-${LocalDate.now()}.md") },

@@ -1,7 +1,9 @@
 # Privacy
 
 Dream Log records you in bed, turns what you say into words, and keeps both on the phone. It
-never sends any of it anywhere, because it has no way to send anything anywhere.
+never sends any of it anywhere, because it has no way to send anything anywhere. The one
+exception is yours to make: "Keep dreams in Notes" hands the words, not the recordings, to
+Notes on the same phone, which keeps and syncs them as it does your other notes.
 
 That is the whole policy. The rest of this page is the evidence for it, because a privacy
 policy that cannot be checked is just a promise.
@@ -36,8 +38,8 @@ files/dreams/20260926-031204.wav   the recording
 files/dreams/20260926-031204.txt   what the phone heard in it
 ```
 
-The file name is when the recording began. That is all of it: no account, no settings, no
-log of when the app was armed.
+The file name is when the recording began. That is all of it, and, if the setting below is on, a list of which dreams have been
+handed to Notes and under what name: no account, no log of when the app was armed.
 
 Deleting a dream deletes both files. Uninstalling the app deletes all of them.
 
@@ -51,6 +53,19 @@ to a computer. It holds what was heard and when, but not the recordings. Once sa
 is outside the app, and deleting a dream or uninstalling the app does not delete it. The app
 writes it only when you press the row, and it needs no permission to do it, because you pick
 the place yourself.
+
+## Keeping dreams in Notes
+
+"Keep dreams in Notes", the one setting, is off until you turn it on. On, each dream's words,
+with its night, time and length, are handed to Notes, another app of mine on the same phone, as
+a note in its `Dreams` folder. The recordings are not. From there they are Notes' to keep: if
+Notes syncs to a Nextcloud or a folder, the words go there too, and deleting a dream in Dream
+Log deletes its note. Turning the setting off leaves the notes already made where they are.
+
+Dream Log hands them over through Notes' own provider on the phone, not over a network, and
+Notes accepts them only from the released Dream Log. To see that it can, the manifest asks to
+see Notes (`<package android:name="com.wanderwildwood.oboegaki"/>` in `<queries>`) and the apps
+that act on selected text, such as the Dictionary. Neither is a permission.
 
 ## No third-party services
 

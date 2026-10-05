@@ -9,6 +9,8 @@
     <string name="log_title">Dream Log</string>
     <!-- Info button in the top bar, read aloud by a screen reader -->
     <string name="log_cd_about">About</string>
+    <!-- Cog button in the top bar, read aloud by a screen reader -->
+    <string name="log_cd_settings">Settings</string>
 
     <!-- The button that starts listening for the night (verb) -->
     <string name="log_arm">Arm for the night</string>
@@ -72,6 +74,27 @@
     <string name="dream_delete_confirm">Delete — tap again</string>
 
     <!-- ============================================================ -->
+    <!-- Settings -->
+
+    <string name="settings_title">Settings</string>
+    <!-- Top bar button, read aloud by a screen reader -->
+    <string name="settings_cd_back">Back</string>
+    <!-- A switch. "Notes" is the name of another app, the note-taking one -->
+    <string name="settings_notes">Keep dreams in Notes</string>
+    <!-- Under the switch -->
+    <string name="settings_notes_what">Each dream\'s words as a note in a Dreams folder. The recordings stay here.</string>
+    <!-- Said when the switch is pressed and Notes is not on the phone, or is too old to take dreams -->
+    <string name="settings_notes_missing">Notes is not on this phone, or is a version that cannot take dreams yet.</string>
+    <!-- Said when Notes is on the phone but has not been given a place to keep notes -->
+    <string name="settings_notes_not_set_up">Notes has nowhere to keep notes yet. Open Notes and choose a place first.</string>
+    <!-- Said when Notes will not take dreams from this copy of Dream Log -->
+    <string name="settings_notes_refused">Notes takes dreams only from the released Dream Log, and this one is not it.</string>
+    <!-- Said when Notes could not be reached for any other reason -->
+    <string name="settings_notes_failed">Notes did not answer. Nothing has been changed.</string>
+    <!-- Button that closes that message -->
+    <string name="settings_close">Close</string>
+
+    <!-- ============================================================ -->
     <!-- The notification shown while armed -->
 
     <!-- The notification channel's name, in the phone's notification settings -->
@@ -84,7 +107,7 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
-    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it. The app has no way to reach the network.</string>
+    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it unless you keep dreams in Notes, which then has the words. The app has no way to reach the network.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
     <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>

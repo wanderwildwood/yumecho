@@ -37,7 +37,16 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
   one Markdown file, oldest night first, to copy to a computer. The recordings stay on the
   phone.
 
-There are no settings.
+- **Kept in Notes**, if you turn on "Keep dreams in Notes" behind the cog: each dream's words
+  also become a Markdown note in a `Dreams` folder of [Notes](https://github.com/wanderwildwood/oboegaki),
+  named for when the recording began ("Dreams/2026-10-05 0712.md"), so they sync wherever
+  Notes syncs, turn up in its search, and open in any Markdown editor. A deleted dream's note is
+  deleted too. The recordings are not copied. Notes takes them only from the released Dream
+  Log, and Dream Log asks Notes before it turns the setting on.
+- **The words can be looked up.** A dream's words are selectable, and the menu over them has
+  Define, from the Dictionary, behind its ⋮.
+
+That is the only setting.
 
 ### Why a volume key
 
@@ -49,7 +58,8 @@ dreams does not walk it to the bottom.
 ## Permissions
 
 `RECORD_AUDIO`, to record. There is no `INTERNET` permission: the recognition runs on the
-phone, so nothing it hears can leave it even by accident. The details, and how to check them
+phone, so nothing it hears can leave it even by accident. With "Keep dreams in Notes" on, the
+words are handed to Notes on the same phone, and Notes syncs them if it has been set up to. The details, and how to check them
 rather than take them on trust, are in [PRIVACY.md](PRIVACY.md).
 
 ## Size

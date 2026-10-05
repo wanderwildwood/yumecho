@@ -34,9 +34,9 @@ import com.wanderwildwood.yumecho.night.Night
 /**
  * The whole app: arm it at night, read it in the morning.
  *
- * There are no settings. How long it waits in silence before it stops, and how long a night
- * lasts, were each set once to what a person half asleep needs, and a screen of knobs for
- * them would be read by nobody at three in the morning.
+ * Its one setting, keeping dreams in Notes, is behind the cog. How long it waits in silence
+ * before it stops, and how long a night lasts, were each set once to what a person half asleep
+ * needs, and a screen of knobs for them would be read by nobody at three in the morning.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +48,7 @@ fun LogScreen(
     onArm: () -> Unit,
     onDisarm: () -> Unit,
     onOpen: (Dream) -> Unit,
+    onSettings: () -> Unit,
     onAbout: () -> Unit,
     exported: Boolean?,
     onExport: () -> Unit,
@@ -57,7 +58,10 @@ fun LogScreen(
         topBar = {
             TopAppBarMMD(
                 title = { TextMMD(text = stringResource(R.string.log_title)) },
-                actions = { BarButton(Icons.Info, stringResource(R.string.log_cd_about), onAbout) },
+                actions = {
+                    BarButton(Icons.Settings, stringResource(R.string.log_cd_settings), onSettings)
+                    BarButton(Icons.Info, stringResource(R.string.log_cd_about), onAbout)
+                },
             )
         },
     ) { contentPadding ->

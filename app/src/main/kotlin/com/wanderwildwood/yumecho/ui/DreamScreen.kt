@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -74,11 +75,15 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
             } else {
                 for (paragraph in paragraphs(text)) {
                     item {
-                        TextMMD(
-                            text = paragraph,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 10.dp),
-                        )
+                        // Selectable, with Define and the rest behind the menu's ⋮: a word the
+                        // phone heard oddly is often one worth looking up.
+                        SelectionContainer(modifier = Modifier.textActions()) {
+                            TextMMD(
+                                text = paragraph,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(bottom = 10.dp),
+                            )
+                        }
                     }
                 }
                 item {

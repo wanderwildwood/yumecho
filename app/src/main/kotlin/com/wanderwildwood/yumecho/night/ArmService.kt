@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import com.wanderwildwood.yumecho.MainActivity
 import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.dreams.Dreams
+import com.wanderwildwood.yumecho.notes.InNotes
 import com.wanderwildwood.yumecho.hearing.Transcriber
 
 /**
@@ -89,6 +90,7 @@ class ArmService : Service() {
     override fun onCreate() {
         super.onCreate()
         Dreams.init(this)
+        InNotes.init(this)
         audio = getSystemService(AudioManager::class.java)
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yumecho:recording")
