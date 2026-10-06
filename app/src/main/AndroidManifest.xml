@@ -2,9 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- To record what you say. The recordings are written to the app's own storage and
-         turned into words on the phone; there is no INTERNET permission, so nothing it
-         hears can leave the phone even by accident. -->
+         turned into words on the phone. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- For one thing only: downloading the listening model for a language other than
+         English, when that is chosen in the settings (hearing/Speech.kt). Nothing the app
+         records or writes is ever sent anywhere. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Armed for the night is a foreground service: it has to keep hearing the volume
          keys, and keep the microphone, with the screen off and the phone locked. -->

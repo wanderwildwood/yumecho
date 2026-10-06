@@ -25,7 +25,7 @@ import java.util.concurrent.Executors
  * Dreams folder, so they sync wherever Notes syncs and turn up in its search.
  *
  * Notes takes them through a small provider of its own, which answers only to the released
- * Dream Log. Dream Log itself still has no way to reach the network; Notes does that part, if
+ * Dream Log. Dream Log itself never sends a dream over the network; Notes does that part, if
  * it has been set up to.
  *
  * It follows the log rather than being told about each change: whenever the list of dreams

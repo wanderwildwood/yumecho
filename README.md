@@ -57,14 +57,18 @@ dreams does not walk it to the bottom.
 
 ## Permissions
 
-`RECORD_AUDIO`, to record. There is no `INTERNET` permission: the recognition runs on the
-phone, so nothing it hears can leave it even by accident. With "Keep dreams in Notes" on, the
+`RECORD_AUDIO`, to record. The recognition runs on the phone, and nothing it hears leaves it.
+`INTERNET`, only to download the listening model for a language other than English, when one
+is chosen in the settings; in English the app never goes online. With "Keep dreams in Notes" on, the
 words are handed to Notes on the same phone, and Notes syncs them if it has been set up to. The details, and how to check them
 rather than take them on trust, are in [PRIVACY.md](PRIVACY.md).
 
 ## Size
 
-Almost all of the APK is the speech model, `ggml-base.en-q5_1` (57 MB, English only). On a
+Almost all of the APK is the speech model, `ggml-base.en-q5_1` (57 MB, English only).
+Choosing another language in the settings (Czech, Danish, Dutch, Finnish, French, German,
+Italian, Norwegian, Polish, Portuguese, Spanish, Swedish) downloads the multilingual
+`ggml-base-q5_1` (60 MB) once; choosing English again deletes it. On a
 Kompakt it wrote 55 seconds of speech down in 28, with punctuation. The smaller `tiny.en` was
 quicker on a short clip but left out the punctuation, and a dream is hard enough to read back
 already.
@@ -87,9 +91,7 @@ Issues and pull requests are welcome. The things that would help most:
   stayed dark, whether the words were anything like what you said.
 - **Other devices.** It should run on any Android 12 or later phone, but it has only been seen
   on one.
-- **Other languages.** The model is English only. A multilingual one is several times larger
-  and slower, which on this phone is a real cost, so it would want to be a choice rather than
-  the default.
+- **Other languages.** How well it hears yours, if it isn't English.
 
 ## Licence
 

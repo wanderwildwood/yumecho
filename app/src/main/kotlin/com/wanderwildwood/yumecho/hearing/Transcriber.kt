@@ -60,7 +60,9 @@ object Transcriber {
         val text = when {
             samples == null -> ""
             !Listening.anythingSaid(samples) -> ""
-            else -> Whisper.transcribe(context.assets, Whisper.MODEL, samples, THREADS)
+            else -> Speech.current(context).let { (language, model) ->
+                Whisper.transcribe(context.assets, Whisper.MODEL, model?.path, language, samples, THREADS)
+            }
                 ?.let(Listening::tidy)
                 // Whisper could not run at all. Left unheard, so it is tried again next time
                 // rather than being marked as silence when it was not.

@@ -1,9 +1,13 @@
 # Privacy
 
 Dream Log records you in bed, turns what you say into words, and keeps both on the phone. It
-never sends any of it anywhere, because it has no way to send anything anywhere. The one
-exception is yours to make: "Keep dreams in Notes" hands the words, not the recordings, to
-Notes on the same phone, which keeps and syncs them as it does your other notes.
+never sends any of it anywhere. The one exception is yours to make: "Keep dreams in Notes"
+hands the words, not the recordings, to Notes on the same phone, which keeps and syncs them as
+it does your other notes.
+
+The app goes online for one thing only, and only if you ask: to download the listening model
+for a language other than English. That is a download, nothing goes up, and with English (the
+default) the app never opens a connection at all.
 
 That is the whole policy. The rest of this page is the evidence for it, because a privacy
 policy that cannot be checked is just a promise.
@@ -14,6 +18,7 @@ policy that cannot be checked is just a promise.
 
 ```
 android.permission.RECORD_AUDIO
+android.permission.INTERNET
 android.permission.FOREGROUND_SERVICE
 android.permission.VIBRATE
 android.permission.WAKE_LOCK
@@ -24,10 +29,15 @@ recording is running: from the press of a volume key to the next press, or to tw
 quiet, or to five minutes at the longest. Armed and waiting, the app is listening for the
 volume key, not to the room.
 
-There is **no `INTERNET` permission**. Without it Android will not let the app open a network
-connection, so nothing it records or writes down can leave the phone even by accident, and no
-promise from me is load-bearing. The speech recognition is whisper.cpp, running on the phone's
-own processor with a model packed inside the app. It is not a service.
+The speech recognition is whisper.cpp, running on the phone's own processor. It is not a
+service. The English model is packed inside the app.
+
+`INTERNET` is there for the other languages, since Dream Log 0.1.5. Choosing one in the
+settings downloads Whisper's multilingual model, about 60 MB, from Hugging Face, at an address
+pinned to one fixed version of the file (`hearing/Speech.kt`). It is a plain download: the
+request carries nothing of yours, and the app keeps the file only if its SHA-256 matches the one
+written in the app. That is the only network code in the app; search the source for `URL(` or
+`HttpURLConnection` and it is the one place. Choosing English again deletes the file.
 
 ## What is stored, and where
 

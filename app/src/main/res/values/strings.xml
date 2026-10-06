@@ -23,7 +23,7 @@
     <string name="log_disarm">Disarm</string>
 
     <!-- Before the microphone permission is granted -->
-    <string name="log_mic_why">Dream Log needs the microphone to record what you say. The recordings stay on this phone; the app has no way to reach the network.</string>
+    <string name="log_mic_why">Dream Log needs the microphone to record what you say. The recordings stay on this phone and are never sent anywhere.</string>
     <!-- Button that asks for the microphone permission (verb) -->
     <string name="log_allow">Allow</string>
 
@@ -107,7 +107,7 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
-    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it unless you keep dreams in Notes, which then has the words. The app has no way to reach the network.</string>
+    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it unless you keep dreams in Notes, which then has the words. The app goes online only to download the listening model for a language other than English, if you choose one.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
     <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
@@ -118,4 +118,12 @@
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <!-- Button that closes the About dialog -->
     <string name="about_close">Close</string>
+    <!-- The language dreams are heard in -->
+    <string name="speech_title">Dreams heard in</string>
+    <!-- Under the row while the other languages' model downloads: "Deutsch: downloading, 40%" -->
+    <string name="speech_downloading">%1$s: downloading, %2$d%%</string>
+    <string name="speech_failed">%1$s: the download did not finish. Tap to try again.</string>
+    <string name="speech_note">English is built in. Any other language needs a second listening model, about 60 MB, downloaded once from Hugging Face over the internet. That download is all the app ever fetches; nothing you record leaves the phone. Choosing English again deletes it.</string>
+    <string name="speech_download">Download (60 MB)</string>
+    <string name="speech_ask">Download the model for %1$s?</string>
 </resources>
