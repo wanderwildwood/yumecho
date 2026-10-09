@@ -33,6 +33,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.hearing.Speech
+import com.wanderwildwood.yumecho.night.DuraSpeed
 import com.wanderwildwood.yumecho.notes.InNotes
 
 /**
@@ -50,6 +51,11 @@ fun SettingsScreen(onBack: () -> Unit) {
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current
     remember { Speech.init(context) }
+    var checks by remember { mutableStateOf(0) }
+    val duraSpeedRisk = remember(checks) { DuraSpeed.atRisk(context) }
+    fun open(intent: android.content.Intent) = runCatching {
+        context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
     var choosingSpeech by remember { mutableStateOf(false) }
     val speech by Speech.state.collectAsState()
     val spoken by Speech.chosen.collectAsState()
@@ -64,6 +70,37 @@ fun SettingsScreen(onBack: () -> Unit) {
         },
     ) { contentPadding ->
         LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+            // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
+            // night is spent. Its list cannot be read, so the second row is how the person says
+            // Dream Log is on it. Only what is wrong is shown.
+            if (duraSpeedRisk) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { open(DuraSpeed.appInfo()) }
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                    ) {
+                        TextMMD(text = stringResource(R.string.settings_duraspeed_open), style = MaterialTheme.typography.bodyLarge)
+                        TextMMD(text = stringResource(R.string.settings_duraspeed), style = MaterialTheme.typography.labelSmall)
+                    }
+                    HorizontalDividerMMD()
+                }
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                DuraSpeed.allowed(context)
+                                checks++
+                            }
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                    ) {
+                        TextMMD(text = stringResource(R.string.settings_duraspeed_done), style = MaterialTheme.typography.bodyLarge)
+                    }
+                    HorizontalDividerMMD()
+                }
+            }
             item {
                 Row(
                     modifier = Modifier

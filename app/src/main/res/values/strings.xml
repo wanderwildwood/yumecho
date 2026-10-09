@@ -77,6 +77,9 @@
     <!-- Settings -->
 
     <string name="settings_title">Settings</string>
+    <string name="settings_duraspeed_open">Open DuraSpeed</string>
+    <string name="settings_duraspeed">The phone\'s DuraSpeed setting can shut Dream Log down in the night, so a press is never heard. Open DuraSpeed, tap Open, and switch Dream Log on.</string>
+    <string name="settings_duraspeed_done">It\'s switched on</string>
     <!-- Top bar button, read aloud by a screen reader -->
     <string name="settings_cd_back">Back</string>
     <!-- A switch. "Notes" is the name of another app, the note-taking one -->
