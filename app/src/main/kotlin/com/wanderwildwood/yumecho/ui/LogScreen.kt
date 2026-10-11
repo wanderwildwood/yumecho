@@ -80,7 +80,7 @@ fun LogScreen(
                 Spacer(Modifier.height(16.dp))
                 TextMMD(text = stringResource(R.string.log_empty), style = MaterialTheme.typography.bodyMedium)
             } else {
-                LazyColumnMMD(modifier = Modifier.fillMaxSize()) {
+                LazyColumnMMD(modifier = Modifier.fillMaxSize(), isScrollbarVisible = false) {
                     for ((date, list) in byNight(dreams)) {
                         item(key = "night-$date") {
                             TextMMD(

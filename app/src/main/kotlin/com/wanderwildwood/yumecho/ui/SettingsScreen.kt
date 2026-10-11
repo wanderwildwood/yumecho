@@ -69,7 +69,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
         },
     ) { contentPadding ->
-        LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+        LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(contentPadding), isScrollbarVisible = false) {
             // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
             // night is spent. Its list cannot be read, so the second row is how the person says
             // Dream Log is on it. Only what is wrong is shown.
@@ -202,7 +202,7 @@ private fun SpeechDialog(current: String, downloaded: Boolean, onDone: (String?)
             TextMMD(text = stringResource(R.string.speech_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
             Spacer(Modifier.height(4.dp))
             TextMMD(text = stringResource(R.string.speech_note), style = MaterialTheme.typography.labelSmall)
-            LazyColumnMMD(modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp)) {
+            LazyColumnMMD(modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp), isScrollbarVisible = false) {
                 for (language in Speech.languages) {
                     item(key = language.code) {
                         TextMMD(
