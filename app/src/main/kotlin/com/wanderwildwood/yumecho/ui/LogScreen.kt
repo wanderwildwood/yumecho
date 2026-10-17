@@ -1,5 +1,6 @@
 package com.wanderwildwood.yumecho.ui
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,33 +69,44 @@ fun LogScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding)
-                .padding(horizontal = 20.dp),
+                .padding(contentPadding),
         ) {
-            Spacer(Modifier.height(16.dp))
-            Arming(night, micAllowed, onArm, onDisarm)
-            Spacer(Modifier.height(16.dp))
-            HorizontalDividerMMD()
-
-            if (dreams.isEmpty()) {
+            Column(Modifier.padding(horizontal = 20.dp)) {
                 Spacer(Modifier.height(16.dp))
-                TextMMD(text = stringResource(R.string.log_empty), style = MaterialTheme.typography.bodyMedium)
-            } else {
-                LazyColumnMMD(modifier = Modifier.fillMaxSize(), isScrollbarVisible = false) {
-                    for ((date, list) in byNight(dreams)) {
-                        item(key = "night-$date") {
-                            TextMMD(
-                                text = nightHeading(date),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
-                            )
+                Arming(night, micAllowed, onArm, onDisarm)
+                Spacer(Modifier.height(16.dp))
+                HorizontalDividerMMD()
+
+                if (dreams.isEmpty()) {
+                    Spacer(Modifier.height(16.dp))
+                    TextMMD(text = stringResource(R.string.log_empty), style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            if (dreams.isNotEmpty()) {
+                // By night, newest first: page dots, not letters. The list keeps its margin;
+                // the dots sit at the panel's edge, as in every other app.
+                val listState = rememberLazyListState()
+                ListJumpBox(listState, ListJump.Pages) {
+                    LazyColumnMMD(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+                        state = listState,
+                        isScrollbarVisible = false,
+                    ) {
+                        for ((date, list) in byNight(dreams)) {
+                            item(key = "night-$date") {
+                                TextMMD(
+                                    text = nightHeading(date),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                                )
+                            }
+                            for (dream in list) {
+                                item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
+                            }
                         }
-                        for (dream in list) {
-                            item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
-                        }
+                        item(key = "export") { ExportRow(exported, onExport) }
                     }
-                    item(key = "export") { ExportRow(exported, onExport) }
                 }
             }
         }
