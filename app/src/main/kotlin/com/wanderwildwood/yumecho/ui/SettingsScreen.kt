@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -69,7 +68,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
         },
     ) { contentPadding ->
-        LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(contentPadding), isScrollbarVisible = false) {
+        PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
             // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
             // night is spent. Its list cannot be read, so the second row is how the person says
             // Dream Log is on it. Only what is wrong is shown.
@@ -202,7 +201,7 @@ private fun SpeechDialog(current: String, downloaded: Boolean, onDone: (String?)
             TextMMD(text = stringResource(R.string.speech_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
             Spacer(Modifier.height(4.dp))
             TextMMD(text = stringResource(R.string.speech_note), style = MaterialTheme.typography.labelSmall)
-            LazyColumnMMD(modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp), isScrollbarVisible = false) {
+            PagedColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp)) {
                 for (language in Speech.languages) {
                     item(key = language.code) {
                         TextMMD(

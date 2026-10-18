@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.yumecho.R
@@ -87,10 +86,9 @@ fun LogScreen(
                 // the dots sit at the panel's edge, as in every other app.
                 val listState = rememberLazyListState()
                 ListJumpBox(listState, ListJump.Pages) {
-                    LazyColumnMMD(
+                    PagedColumn(
                         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
                         state = listState,
-                        isScrollbarVisible = false,
                     ) {
                         for ((date, list) in byNight(dreams)) {
                             item(key = "night-$date") {
