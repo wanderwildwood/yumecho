@@ -5,7 +5,6 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 
 /**
@@ -23,7 +22,14 @@ import android.provider.Settings
 object DuraSpeed {
     private const val PACKAGE = "com.mediatek.duraspeed"
 
-    fun isKompakt(): Boolean = Build.MANUFACTURER.equals("Mudita", ignoreCase = true)
+    /**
+     * DuraSpeed is on this phone. Asked of the package itself, not the maker's name: a Kompakt
+     * running another system (KompaktOS) still says Mudita and has no DuraSpeed.
+     */
+    fun present(context: Context): Boolean = runCatching {
+        context.packageManager.getApplicationInfo(PACKAGE, 0)
+        true
+    }.getOrDefault(false)
 
     /** DuraSpeed's own switch; null where the phone does not say. */
     fun isOn(context: Context): Boolean? = runCatching {
@@ -41,7 +47,7 @@ object DuraSpeed {
 
     /** Whether an armed night may be cut short: the Settings rows show while this is so. */
     fun atRisk(context: Context): Boolean {
-        if (!isKompakt()) return false
+        if (!present(context)) return false
         val on = isOn(context) != false
         val prefs = prefs(context)
         val am = context.getSystemService(ActivityManager::class.java)

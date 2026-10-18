@@ -22,6 +22,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <queries>
+        <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
+        <package android:name="com.mediatek.duraspeed" />
         <!-- Lets the menu over a dream's words list other apps' text actions, such as Define
              from the Dictionary. Without it Android 11+ hides them from this app. -->
         <intent>
