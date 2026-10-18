@@ -129,4 +129,7 @@
     <string name="speech_note">English is built in. Any other language needs a second listening model, about 60 MB, downloaded once from Hugging Face over the internet. That download is all the app ever fetches; nothing you record leaves the phone. Choosing English again deletes it.</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
+    <string name="list_jump_setting">Letters and page dots</string>
+    <string name="list_jump_shown">Shown</string>
+    <string name="list_jump_hidden">Hidden</string>
 </resources>
