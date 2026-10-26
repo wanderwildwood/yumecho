@@ -79,7 +79,6 @@
     <string name="settings_title">Settings</string>
     <string name="settings_duraspeed_open">Open DuraSpeed</string>
     <string name="settings_duraspeed">The phone\'s DuraSpeed setting can shut Dream Log down in the night, so a press is never heard. Open DuraSpeed, tap Open, and switch Dream Log on.</string>
-    <string name="settings_duraspeed_done">It\'s switched on</string>
     <!-- Top bar button, read aloud by a screen reader -->
     <string name="settings_cd_back">Back</string>
     <!-- A switch. "Notes" is the name of another app, the note-taking one -->
@@ -110,7 +109,8 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
-    <string name="about_privacy">What you say is recorded and turned into words on this phone, and stays on it unless you keep dreams in Notes, which then has the words. The app goes online only to download the listening model for a language other than English, if you choose one.</string>
+    <string name="about_privacy">Privacy: your voice is recorded and turned into words on this phone, and nothing leaves it. The one thing the app fetches is the speech model for a language other than English, once, which is all the internet permission is for. If you keep dreams in Notes, Notes has the words.</string>
+    <string name="about_terms">Terms: this is a journal tool. It is not medical or professional advice, and the words it makes can be wrong.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
     <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
@@ -127,6 +127,9 @@
     <string name="speech_downloading">%1$s: downloading, %2$d%%</string>
     <string name="speech_failed">%1$s: the download did not finish. Tap to try again.</string>
     <string name="speech_note">English is built in. Any other language needs a second listening model, about 60 MB, downloaded once from Hugging Face over the internet. That download is all the app ever fetches; nothing you record leaves the phone. Choosing English again deletes it.</string>
+    <string name="speech_current">%1$s (current)</string>
+    <string name="speech_stop_ask">Stop the download? The language stays as it is.</string>
+    <string name="speech_stop">Stop download</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
     <string name="list_jump_setting">Letters and page dots</string>

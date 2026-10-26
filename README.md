@@ -18,7 +18,7 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 
 ## Where this is up to
 
-Version 0.1.13. Every screen has been driven on an emulator, and the speech recognition has
+Version 0.1.14. Every screen has been driven on an emulator, and the speech recognition has
 been timed on a Kompakt: a minute of speech takes about half a minute to write down.
 
 ## How it works

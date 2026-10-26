@@ -50,11 +50,11 @@ fun SettingsScreen(onBack: () -> Unit) {
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current
     remember { Speech.init(context) }
-    var checks by remember { mutableStateOf(0) }
-    val duraSpeedRisk = remember(checks) { DuraSpeed.atRisk(context) }
+    val duraSpeedRisk = remember { DuraSpeed.atRisk(context) }
     fun open(intent: android.content.Intent) = runCatching {
         context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
     }
+    var stopping by remember { mutableStateOf(false) }
     var choosingSpeech by remember { mutableStateOf(false) }
     val speech by Speech.state.collectAsState()
     val spoken by Speech.chosen.collectAsState()
@@ -70,8 +70,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     ) { contentPadding ->
         PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
             // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
-            // night is spent. Its list cannot be read, so the second row is how the person says
-            // Dream Log is on it. Only what is wrong is shown.
+            // night is spent. Its list cannot be read, so the hint always shows. (Dream Log is on it can't be read, so the hint always shows.
             if (duraSpeedRisk) {
                 item {
                     Column(
@@ -82,20 +81,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                     ) {
                         TextMMD(text = stringResource(R.string.settings_duraspeed_open), style = MaterialTheme.typography.bodyLarge)
                         TextMMD(text = stringResource(R.string.settings_duraspeed), style = MaterialTheme.typography.labelSmall)
-                    }
-                    HorizontalDividerMMD()
-                }
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                DuraSpeed.allowed(context)
-                                checks++
-                            }
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
-                    ) {
-                        TextMMD(text = stringResource(R.string.settings_duraspeed_done), style = MaterialTheme.typography.bodyLarge)
                     }
                     HorizontalDividerMMD()
                 }
@@ -155,7 +140,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         .fillMaxWidth()
                         .clickable {
                             val now = speech
-                            if (now is Speech.State.Failed) Speech.choose(context, now.language) else choosingSpeech = true
+                            if (now is Speech.State.Failed) Speech.choose(context, now.language) else if (now is Speech.State.Downloading) stopping = true else choosingSpeech = true
                         }
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                 ) {
@@ -170,6 +155,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                 }
                 HorizontalDividerMMD()
+            }
+        }
+    }
+
+    if (stopping) {
+        EInkDialog(onDismiss = { stopping = false }) {
+            TextMMD(text = stringResource(R.string.speech_stop_ask), style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(16.dp))
+            ButtonMMD(
+                onClick = { Speech.cancel(); stopping = false },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.speech_stop)) }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButtonMMD(onClick = { stopping = false }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                TextMMD(text = stringResource(R.string.settings_close))
             }
         }
     }
@@ -223,7 +223,7 @@ private fun SpeechDialog(current: String, downloaded: Boolean, onDone: (String?)
                 for (language in Speech.languages) {
                     item(key = language.code) {
                         TextMMD(
-                            text = language.name,
+                            text = if (language.code == current) stringResource(R.string.speech_current, language.name) else language.name,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = if (language.code == current) FontWeight.Bold else null,
                             modifier = Modifier

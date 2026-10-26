@@ -139,7 +139,7 @@ private fun Playback(dream: Dream) {
 }
 
 /**
- * Asks in its own face, and forgets it asked after four seconds, so a stray tap does not leave
+ * Asks in its own face, and forgets it asked after five and a half seconds, so a stray tap does not leave
  * a live delete for whoever picks the phone up next.
  */
 @Composable
@@ -147,7 +147,7 @@ private fun DeleteRow(onDelete: () -> Unit) {
     var armed by remember { mutableStateOf(false) }
     LaunchedEffect(armed) {
         if (armed) {
-            delay(4000)
+            delay(5500)
             armed = false
         }
     }

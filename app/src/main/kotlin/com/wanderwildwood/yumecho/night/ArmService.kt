@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.media.AudioManager
+import android.database.ContentObserver
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -18,6 +19,7 @@ import android.os.PowerManager
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.VibratorManager
+import android.provider.Settings
 import androidx.core.content.ContextCompat
 import com.wanderwildwood.yumecho.MainActivity
 import com.wanderwildwood.yumecho.R
@@ -28,7 +30,7 @@ import com.wanderwildwood.yumecho.hearing.Transcriber
 /**
  * Armed: waiting for a volume key, all night, with the screen off and the phone locked.
  *
- * A press is heard as the media volume changing (see [Silence] for why media), and the volume
+ * A press is heard as the media, ringer or notification volume changing, whichever the phone's keys move (see [Silence] for why media), and the volume
  * is put straight back. One buzz means it is recording; two mean it has stopped. That is the
  * whole of the feedback, on purpose: nothing here turns the screen on, lights it, or unlocks
  * the phone, and the only wake lock held is the partial one that keeps the processor awake
@@ -48,8 +50,13 @@ class ArmService : Service() {
         // Never the alarm or a call: a volume key pressed to quiet the morning alarm must not
         // start a recording.
         private val KEY_STREAMS = setOf(
-            AudioManager.STREAM_RING, AudioManager.STREAM_MUSIC,
+            AudioManager.STREAM_RING, AudioManager.STREAM_MUSIC, AudioManager.STREAM_NOTIFICATION,
             9 /* tts */, 10 /* accessibility */, 11 /* assistant */,
+        )
+
+        // The streams whose volume is watched and put back. On a Kompakt the keys move the ringer.
+        private val WATCHED = listOf(
+            AudioManager.STREAM_MUSIC, AudioManager.STREAM_RING, AudioManager.STREAM_NOTIFICATION,
         )
 
         fun arm(context: Context) =
@@ -69,6 +76,7 @@ class ArmService : Service() {
     private var lastPress = 0L
     private var settlingUntil = 0L
     private var armedVolumes = emptyMap<Int, Int>()
+    private var armedRinger = AudioManager.RINGER_MODE_NORMAL
 
     private val expire = Runnable { stopSelf() }
 
@@ -78,11 +86,29 @@ class ArmService : Service() {
             val now = intent.getIntExtra("android.media.EXTRA_VOLUME_STREAM_VALUE", -1)
             val was = intent.getIntExtra("android.media.EXTRA_PREV_VOLUME_STREAM_VALUE", -1)
             if (now == was || stream !in KEY_STREAMS) return
-            // The reset below changes the volume too, and must not count as a press.
-            if (SystemClock.elapsedRealtime() < settlingUntil) return
-            main.postDelayed(::putVolumesBack, 300)
-            pressed()
+            keyPressed()
         }
+    }
+
+    /** Some phones send no broadcast for the ringer; the setting changing is heard instead. */
+    private val settings = object : ContentObserver(main) {
+        override fun onChange(selfChange: Boolean) {
+            if (armedVolumes.any { (stream, volume) -> audio.getStreamVolume(stream) != volume }) keyPressed()
+        }
+    }
+
+    /** The ringer going to vibrate or silent is the key too (a press at the bottom of the ringer). */
+    private val ringer = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (audio.ringerMode != armedRinger) keyPressed()
+        }
+    }
+
+    private fun keyPressed() {
+        // The reset below changes the volume too, and must not count as a press.
+        if (SystemClock.elapsedRealtime() < settlingUntil) return
+        main.postDelayed(::putVolumesBack, 300)
+        pressed()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -116,14 +142,28 @@ class ArmService : Service() {
         val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val music = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
         if (music == 0 || music == max) audio.setStreamVolume(AudioManager.STREAM_MUSIC, max / 2, 0)
-        armedVolumes = listOf(AudioManager.STREAM_MUSIC, AudioManager.STREAM_RING)
-            .associateWith { audio.getStreamVolume(it) }
+        // The same for the ringer, which is what the keys move on a Kompakt. Refused under Do
+        // Not Disturb, and then left as it is.
+        armedRinger = audio.ringerMode
+        if (armedRinger == AudioManager.RINGER_MODE_NORMAL) {
+            val ringMax = audio.getStreamMaxVolume(AudioManager.STREAM_RING)
+            val ring = audio.getStreamVolume(AudioManager.STREAM_RING)
+            if (ringMax > 1 && (ring <= 1 || ring == ringMax)) {
+                runCatching { audio.setStreamVolume(AudioManager.STREAM_RING, (ringMax / 2).coerceAtLeast(2), 0) }
+            }
+        }
+        armedVolumes = WATCHED.associateWith { audio.getStreamVolume(it) }
 
         silence.start()
         ContextCompat.registerReceiver(
             this, keys, IntentFilter("android.media.VOLUME_CHANGED_ACTION"),
             ContextCompat.RECEIVER_EXPORTED,
         )
+        ContextCompat.registerReceiver(
+            this, ringer, IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION),
+            ContextCompat.RECEIVER_EXPORTED,
+        )
+        contentResolver.registerContentObserver(Settings.System.CONTENT_URI, true, settings)
         main.postDelayed(expire, LONGEST_NIGHT)
         Night.current.value = Night.State.ARMED
         // Not sticky: if Android kills it, it stays off rather than coming back without the
@@ -162,6 +202,7 @@ class ArmService : Service() {
                 runCatching { audio.setStreamVolume(stream, volume, 0) }
             }
         }
+        if (audio.ringerMode != armedRinger) runCatching { audio.ringerMode = armedRinger }
     }
 
     private fun buzz(twice: Boolean) {
@@ -174,6 +215,8 @@ class ArmService : Service() {
         main.removeCallbacksAndMessages(null)
         if (armed) {
             unregisterReceiver(keys)
+            unregisterReceiver(ringer)
+            contentResolver.unregisterContentObserver(settings)
             silence.stop()
             if (recorder.isRecording) recorder.stop()
         }

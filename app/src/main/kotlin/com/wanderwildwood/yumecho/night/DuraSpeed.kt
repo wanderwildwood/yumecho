@@ -1,7 +1,5 @@
 package com.wanderwildwood.yumecho.night
 
-import android.app.ActivityManager
-import android.app.ApplicationExitInfo
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -38,33 +36,12 @@ object DuraSpeed {
             ?: Settings.System.getString(cr, "setting.duraspeed.enabled"))?.let { it != "0" }
     }.getOrNull()
 
-    private fun prefs(context: Context) = context.getSharedPreferences("duraspeed", Context.MODE_PRIVATE)
-
-    /** The person has said this app is switched on in DuraSpeed's list. */
-    fun allowed(context: Context) {
-        prefs(context).edit().putBoolean("allowed", true).apply()
-    }
-
-    /** Whether an armed night may be cut short: the Settings rows show while this is so. */
-    fun atRisk(context: Context): Boolean {
-        if (!present(context)) return false
-        val on = isOn(context) != false
-        val prefs = prefs(context)
-        val am = context.getSystemService(ActivityManager::class.java)
-        val stop = runCatching { am.getHistoricalProcessExitReasons(context.packageName, 0, 0) }
-            .getOrDefault(emptyList())
-            .filter {
-                it.reason == ApplicationExitInfo.REASON_USER_REQUESTED &&
-                    it.description?.contains("due to from pid") == true
-            }
-            .maxOfOrNull { it.timestamp }
-        if (stop != null && stop > prefs.getLong("stopSeen", 0L)) {
-            prefs.edit().putLong("stopSeen", stop).apply()
-            // Only a stop while DuraSpeed is on is DuraSpeed's.
-            if (on) prefs.edit().putBoolean("allowed", false).apply()
-        }
-        return on && !prefs.getBoolean("allowed", false)
-    }
+    /**
+     * Whether an armed night may be cut short: the Settings rows show while this is so. DuraSpeed's
+     * list of apps cannot be read, so Dream Log being on it cannot be checked, and the hint
+     * shows whenever DuraSpeed is on this phone and not switched off.
+     */
+    fun atRisk(context: Context): Boolean = present(context) && isOn(context) != false
 
     fun appInfo(): Intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         .setData(Uri.parse("package:$PACKAGE"))

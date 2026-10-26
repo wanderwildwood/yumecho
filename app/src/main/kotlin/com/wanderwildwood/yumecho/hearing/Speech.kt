@@ -116,6 +116,13 @@ object Speech {
         worker.execute { download(language) }
     }
 
+    /** Stop a download in progress; the half-file goes and the language stays as it was. */
+    fun cancel() {
+        if (_state.value !is State.Downloading) return
+        cancelled = true
+        _state.value = State.Idle
+    }
+
     private fun download(language: String) {
         val part = File(model.path + ".part")
         part.parentFile?.mkdirs()
