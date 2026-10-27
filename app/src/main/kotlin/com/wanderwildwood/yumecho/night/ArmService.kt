@@ -5,13 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.media.AudioManager
-import android.database.ContentObserver
+import android.media.MediaRoute2Info
+import android.media.MediaRouter2
+import android.media.RouteDiscoveryPreference
+import android.media.VolumeProvider
+import android.media.session.MediaSession
+import android.media.session.PlaybackState
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -19,7 +23,6 @@ import android.os.PowerManager
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.VibratorManager
-import android.provider.Settings
 import androidx.core.content.ContextCompat
 import com.wanderwildwood.yumecho.MainActivity
 import com.wanderwildwood.yumecho.R
@@ -30,34 +33,26 @@ import com.wanderwildwood.yumecho.hearing.Transcriber
 /**
  * Armed: waiting for a volume key, all night, with the screen off and the phone locked.
  *
- * A press is heard as the media, ringer or notification volume changing, whichever the phone's keys move (see [Silence] for why media), and the volume
- * is put straight back. One buzz means it is recording; two mean it has stopped. That is the
- * whole of the feedback, on purpose: nothing here turns the screen on, lights it, or unlocks
- * the phone, and the only wake lock held is the partial one that keeps the processor awake
- * while it records.
+ * While armed the app holds a media session that says it is playing to a remote device whose
+ * volume it looks after itself, and points its media at a pretend speaker of its own
+ * ([KeyRoute]: Android 12+ only lets a remote session have the keys when the app has such a
+ * route). With nothing else playing, Android hands the volume keys to that session instead of moving any of the phone's own volumes, screen on or off, whatever the
+ * ringer is set to. So a press reaches [onAdjustVolume] directly, no sound is played, and the
+ * ringer, notification and media volumes are never touched. (Earlier versions listened for a
+ * volume changing; on a phone set to vibrate the keys move nothing, so nothing was heard.)
+ *
+ * One buzz means it is recording; two mean it has stopped. That is the whole of the feedback,
+ * on purpose: nothing here turns the screen on, lights it, or unlocks the phone, and the only
+ * wake lock held is the partial one that keeps the processor awake while it records.
  *
  * Started from the app while it is open, which is what lets it keep using the microphone once
  * the phone is locked. It disarms itself after [LONGEST_NIGHT], so a morning spent forgetting
- * about it does not leave it playing silence all day.
+ * about it does not leave it armed all day.
  */
 class ArmService : Service() {
     companion object {
         private const val LONGEST_NIGHT = 12 * 60 * 60 * 1000L
         private const val DEBOUNCE = 1500L
-
-        // Media, and the streams Android reports alongside it. The ringer is here because on a
-        // phone that does not count the silence as media playing, the key goes there instead.
-        // Never the alarm or a call: a volume key pressed to quiet the morning alarm must not
-        // start a recording.
-        private val KEY_STREAMS = setOf(
-            AudioManager.STREAM_RING, AudioManager.STREAM_MUSIC, AudioManager.STREAM_NOTIFICATION,
-            9 /* tts */, 10 /* accessibility */, 11 /* assistant */,
-        )
-
-        // The streams whose volume is watched and put back. On a Kompakt the keys move the ringer.
-        private val WATCHED = listOf(
-            AudioManager.STREAM_MUSIC, AudioManager.STREAM_RING, AudioManager.STREAM_NOTIFICATION,
-        )
 
         fun arm(context: Context) =
             ContextCompat.startForegroundService(context, Intent(context, ArmService::class.java))
@@ -68,47 +63,102 @@ class ArmService : Service() {
     }
 
     private val main = Handler(Looper.getMainLooper())
-    private val silence = Silence()
-    private lateinit var audio: AudioManager
     private lateinit var wakeLock: PowerManager.WakeLock
     private lateinit var recorder: Recorder
+    private var session: MediaSession? = null
+    private var router: MediaRouter2? = null
     private var armed = false
     private var lastPress = 0L
-    private var settlingUntil = 0L
-    private var armedVolumes = emptyMap<Int, Int>()
-    private var armedRinger = AudioManager.RINGER_MODE_NORMAL
 
     private val expire = Runnable { stopSelf() }
 
-    private val keys = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val stream = intent.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", -1)
-            val now = intent.getIntExtra("android.media.EXTRA_VOLUME_STREAM_VALUE", -1)
-            val was = intent.getIntExtra("android.media.EXTRA_PREV_VOLUME_STREAM_VALUE", -1)
-            if (now == was || stream !in KEY_STREAMS) return
-            keyPressed()
+    /**
+     * The volume the keys move while armed: a pretend one, held in the middle so a press is
+     * never at an end of the range. Only the press matters, never the number.
+     */
+    private val keys = object : VolumeProvider(VOLUME_CONTROL_RELATIVE, 10, 5) {
+        override fun onAdjustVolume(direction: Int) {
+            // Android also calls this with 0 as the key comes up; only a press counts.
+            if (direction != 0) main.post(::pressed)
         }
     }
 
-    /** Some phones send no broadcast for the ringer; the setting changing is heard instead. */
-    private val settings = object : ContentObserver(main) {
-        override fun onChange(selfChange: Boolean) {
-            if (armedVolumes.any { (stream, volume) -> audio.getStreamVolume(stream) != volume }) keyPressed()
+    /** Moves this app's media to [KeyRoute] as soon as the system lists it. */
+    private val routeWatch = object : MediaRouter2.RouteCallback() {
+        // Android 12 and 13 call these two; 14 and later call onRoutesUpdated.
+        @Deprecated("Android 14 calls onRoutesUpdated")
+        override fun onRoutesAdded(routes: List<MediaRoute2Info>) = takeTheRoute()
+        @Deprecated("Android 14 calls onRoutesUpdated")
+        override fun onRoutesChanged(routes: List<MediaRoute2Info>) = takeTheRoute()
+        override fun onRoutesUpdated(routes: List<MediaRoute2Info>) = takeTheRoute()
+    }
+
+    /** If Android lets the route go in the night, it is taken again. */
+    private val transfers = object : MediaRouter2.TransferCallback() {
+        override fun onStop(controller: MediaRouter2.RoutingController) {
+            main.postDelayed(::takeTheRoute, 1000)
+            main.postDelayed(nudge, 4000)
         }
     }
 
-    /** The ringer going to vibrate or silent is the key too (a press at the bottom of the ringer). */
-    private val ringer = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (audio.ringerMode != armedRinger) keyPressed()
+    private fun onTheRoute() = router?.controllers.orEmpty()
+        .any { c -> c.selectedRoutes.any { it.features.contains(KeyRoute.FEATURE) } }
+
+    /**
+     * After the app has been force-stopped (by hand, or by a background manager such as
+     * DuraSpeed) Android 12 does not reconnect to [KeyRoute] by itself, so the route never
+     * appears. Switching the route off and on again makes Android look for it afresh.
+     */
+    private val nudge = Runnable {
+        if (!armed || onTheRoute()) return@Runnable
+        val route = ComponentName(this, KeyRoute::class.java)
+        packageManager.setComponentEnabledSetting(
+            route, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP,
+        )
+        packageManager.setComponentEnabledSetting(
+            route, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP,
+        )
+    }
+
+    private fun takeTheRoute() {
+        val router = router ?: return
+        if (onTheRoute()) return
+        router.routes.firstOrNull { it.features.contains(KeyRoute.FEATURE) }?.let(router::transferTo)
+    }
+
+    private fun holdTheKeys() {
+        router = MediaRouter2.getInstance(this).apply {
+            registerRouteCallback(
+                { main.post(it) }, routeWatch,
+                RouteDiscoveryPreference.Builder(listOf(KeyRoute.FEATURE), true).build(),
+            )
+            registerTransferCallback({ main.post(it) }, transfers)
+        }
+        takeTheRoute()
+        main.postDelayed(nudge, 3000)
+        session = MediaSession(this, "yumecho:armed").apply {
+            // Android hands a key press to the volume below through the session's callback
+            // thread, and drops it when there is no callback, so an empty one is set.
+            setCallback(object : MediaSession.Callback() {}, main)
+            setPlaybackToRemote(keys)
+            setPlaybackState(
+                PlaybackState.Builder()
+                    .setState(PlaybackState.STATE_PLAYING, 0, 0f)
+                    .build(),
+            )
+            isActive = true
         }
     }
 
-    private fun keyPressed() {
-        // The reset below changes the volume too, and must not count as a press.
-        if (SystemClock.elapsedRealtime() < settlingUntil) return
-        main.postDelayed(::putVolumesBack, 300)
-        pressed()
+    private fun letGoOfTheKeys() {
+        router?.run {
+            unregisterTransferCallback(transfers)
+            unregisterRouteCallback(routeWatch)
+            stop()
+        }
+        router = null
+        session?.run { isActive = false; release() }
+        session = null
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -117,7 +167,6 @@ class ArmService : Service() {
         super.onCreate()
         Dreams.init(this)
         InNotes.init(this)
-        audio = getSystemService(AudioManager::class.java)
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yumecho:recording")
         recorder = Recorder { _, _ ->
@@ -132,38 +181,12 @@ class ArmService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(
-            1, notification(),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+            1, notification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
         )
         if (armed) return START_NOT_STICKY
         armed = true
 
-        // A press at either end of the range changes nothing, so nothing is heard.
-        val max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val music = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
-        if (music == 0 || music == max) audio.setStreamVolume(AudioManager.STREAM_MUSIC, max / 2, 0)
-        // The same for the ringer, which is what the keys move on a Kompakt. Refused under Do
-        // Not Disturb, and then left as it is.
-        armedRinger = audio.ringerMode
-        if (armedRinger == AudioManager.RINGER_MODE_NORMAL) {
-            val ringMax = audio.getStreamMaxVolume(AudioManager.STREAM_RING)
-            val ring = audio.getStreamVolume(AudioManager.STREAM_RING)
-            if (ringMax > 1 && (ring <= 1 || ring == ringMax)) {
-                runCatching { audio.setStreamVolume(AudioManager.STREAM_RING, (ringMax / 2).coerceAtLeast(2), 0) }
-            }
-        }
-        armedVolumes = WATCHED.associateWith { audio.getStreamVolume(it) }
-
-        silence.start()
-        ContextCompat.registerReceiver(
-            this, keys, IntentFilter("android.media.VOLUME_CHANGED_ACTION"),
-            ContextCompat.RECEIVER_EXPORTED,
-        )
-        ContextCompat.registerReceiver(
-            this, ringer, IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION),
-            ContextCompat.RECEIVER_EXPORTED,
-        )
-        contentResolver.registerContentObserver(Settings.System.CONTENT_URI, true, settings)
+        holdTheKeys()
         main.postDelayed(expire, LONGEST_NIGHT)
         Night.current.value = Night.State.ARMED
         // Not sticky: if Android kills it, it stays off rather than coming back without the
@@ -188,23 +211,6 @@ class ArmService : Service() {
         }
     }
 
-    /**
-     * Every volume a press may have moved goes back to where arming left it. Without this a
-     * night of presses walks the volume to the bottom, where a press changes nothing and so is
-     * never heard.
-     */
-    private fun putVolumesBack() {
-        settlingUntil = SystemClock.elapsedRealtime() + 1500
-        for ((stream, volume) in armedVolumes) {
-            if (audio.getStreamVolume(stream) != volume) {
-                // Moving the ringer can be refused while Do Not Disturb is on. The media volume
-                // is the one that matters, so a refusal here is let go.
-                runCatching { audio.setStreamVolume(stream, volume, 0) }
-            }
-        }
-        if (audio.ringerMode != armedRinger) runCatching { audio.ringerMode = armedRinger }
-    }
-
     private fun buzz(twice: Boolean) {
         val vibrator = getSystemService(VibratorManager::class.java).defaultVibrator
         val pattern = if (twice) longArrayOf(0, 120, 150, 120) else longArrayOf(0, 200)
@@ -214,10 +220,7 @@ class ArmService : Service() {
     override fun onDestroy() {
         main.removeCallbacksAndMessages(null)
         if (armed) {
-            unregisterReceiver(keys)
-            unregisterReceiver(ringer)
-            contentResolver.unregisterContentObserver(settings)
-            silence.stop()
+            letGoOfTheKeys()
             if (recorder.isRecording) recorder.stop()
         }
         if (wakeLock.isHeld) wakeLock.release()

@@ -18,7 +18,7 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 
 ## Where this is up to
 
-Version 0.1.14. Every screen has been driven on an emulator, and the speech recognition has
+Version 0.1.15. Every screen has been driven on an emulator, and the speech recognition has
 been timed on a Kompakt: a minute of speech takes about half a minute to write down.
 
 ## How it works
@@ -51,9 +51,10 @@ That is the only setting.
 ### Why a volume key
 
 It is the one button you can find in the dark without looking, and the only one Android lets an
-app hear with the screen off. To hear it, the app plays silence while armed, which makes it the
-thing the volume keys belong to, and puts the volume back after every press so a night of
-dreams does not walk it to the bottom.
+app hear with the screen off. While armed, the app tells Android it is playing to a remote
+speaker whose volume it looks after (it plays nothing), so the volume keys come to it instead
+of moving any of the phone's volumes. Ringer, notification and media volumes are never touched,
+and it works the same with the phone set to ring, vibrate or silent.
 
 ## Permissions
 

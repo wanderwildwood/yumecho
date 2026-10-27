@@ -82,29 +82,26 @@ fun LogScreen(
                 }
             }
             if (dreams.isNotEmpty()) {
-                // By night, newest first: page dots, not letters. The list keeps its margin;
-                // the dots sit at the panel's edge, as in every other app.
+                // By night, newest first, a whole page at a time.
                 val listState = rememberLazyListState()
-                ListJumpBox(listState, ListJump.Pages) {
-                    PagedColumn(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
-                        state = listState,
-                    ) {
-                        for ((date, list) in byNight(dreams)) {
-                            item(key = "night-$date") {
-                                TextMMD(
-                                    text = nightHeading(date),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
-                                )
-                            }
-                            for (dream in list) {
-                                item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
-                            }
+                PagedColumn(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+                    state = listState,
+                ) {
+                    for ((date, list) in byNight(dreams)) {
+                        item(key = "night-$date") {
+                            TextMMD(
+                                text = nightHeading(date),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                            )
                         }
-                        item(key = "export") { ExportRow(exported, onExport) }
+                        for (dream in list) {
+                            item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
+                        }
                     }
+                    item(key = "export") { ExportRow(exported, onExport) }
                 }
             }
         }

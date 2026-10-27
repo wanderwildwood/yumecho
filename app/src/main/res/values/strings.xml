@@ -103,6 +103,9 @@
     <string name="channel_armed">Armed</string>
     <string name="notification_armed">Armed for the night</string>
     <string name="notification_armed_how">Press a volume key to record a dream</string>
+    <!-- The name of the pretend speaker the app plays to while armed, so the volume keys come
+         to it. It can show in the phone's list of places sound goes. -->
+    <string name="route_keys">Dream Log volume keys</string>
 
     <!-- ============================================================ -->
     <!-- About dialog. Keep the names of the app, projects and licences as they are -->
@@ -132,7 +135,4 @@
     <string name="speech_stop">Stop download</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
-    <string name="list_jump_setting">Letters and page dots</string>
-    <string name="list_jump_shown">Shown</string>
-    <string name="list_jump_hidden">Hidden</string>
 </resources>

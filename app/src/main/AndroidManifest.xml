@@ -58,7 +58,19 @@
         <service
             android:name=".night.ArmService"
             android:exported="false"
-            android:foregroundServiceType="microphone|mediaPlayback" />
+            android:foregroundServiceType="microphone" />
+
+        <!-- A pretend speaker the app plays nothing to, chosen only by the app itself while
+             armed: Android 12+ gives the volume keys to an app's media session only when the
+             app has a route of its own (night/KeyRoute.kt). Exported because the system
+             binds to it. -->
+        <service
+            android:name=".night.KeyRoute"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.MediaRoute2ProviderService" />
+            </intent-filter>
+        </service>
 
     </application>
 
