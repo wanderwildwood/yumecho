@@ -1,6 +1,7 @@
 package com.wanderwildwood.yumecho.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -112,6 +113,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         TextMMD(text = stringResource(R.string.settings_notes), style = MaterialTheme.typography.bodyLarge)
                         TextMMD(text = stringResource(R.string.settings_notes_what), style = MaterialTheme.typography.labelSmall)
                     }
+                    Spacer(Modifier.width(16.dp))
                     SwitchMMD(checked = on, onCheckedChange = null)
                 }
                 HorizontalDividerMMD()
