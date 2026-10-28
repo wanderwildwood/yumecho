@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -83,7 +82,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         TextMMD(text = stringResource(R.string.settings_duraspeed_open), style = MaterialTheme.typography.bodyLarge)
                         TextMMD(text = stringResource(R.string.settings_duraspeed), style = MaterialTheme.typography.labelSmall)
                     }
-                    HorizontalDividerMMD()
+                    Spacer(Modifier.height(12.dp))
                 }
             }
             item {
@@ -116,7 +115,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Spacer(Modifier.width(16.dp))
                     SwitchMMD(checked = on, onCheckedChange = null)
                 }
-                HorizontalDividerMMD()
+                Spacer(Modifier.height(12.dp))
             }
             item {
                 Column(
@@ -138,7 +137,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
-                HorizontalDividerMMD()
+                Spacer(Modifier.height(12.dp))
             }
         }
     }
