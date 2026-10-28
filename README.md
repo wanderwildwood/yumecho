@@ -18,7 +18,7 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 
 ## Where this is up to
 
-Version 0.1.15. Every screen has been driven on an emulator, and the speech recognition has
+Version 0.1.18. Every screen has been driven on an emulator, and the speech recognition has
 been timed on a Kompakt: a minute of speech takes about half a minute to write down.
 
 ## How it works
@@ -43,6 +43,10 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
   Notes syncs, turn up in its search, and open in any Markdown editor. A deleted dream's note is
   deleted too. The recordings are not copied. Notes takes them only from the released Dream
   Log, and Dream Log asks Notes before it turns the setting on.
+- **Kept in your Nextcloud**, if you sign in under Settings > Nextcloud and turn on sending: the
+  words of each dream (never the recordings) are saved as Markdown files in a folder of your own
+  Nextcloud, over https. Sign-in is Nextcloud's own page (Login Flow v2); the app password it hands
+  over is sealed with the Android Keystore. Off by default. A deleted dream's copy is deleted too.
 - **The words can be looked up.** A dream's words are selectable, and the menu over them has
   Define, from the Dictionary, behind its ⋮.
 
@@ -60,7 +64,8 @@ and it works the same with the phone set to ring, vibrate or silent.
 
 `RECORD_AUDIO`, to record. The recognition runs on the phone, and nothing it hears leaves it.
 `INTERNET`, only to download the listening model for a language other than English, when one
-is chosen in the settings; in English the app never goes online. With "Keep dreams in Notes" on, the
+is chosen in the settings, and to send the words of dreams to your own Nextcloud, if you turn that on;
+with neither, the app never goes online. With "Keep dreams in Notes" on, the
 words are handed to Notes on the same phone, and Notes syncs them if it has been set up to. The details, and how to check them
 rather than take them on trust, are in [PRIVACY.md](PRIVACY.md).
 

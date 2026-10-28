@@ -53,8 +53,8 @@ android {
         // The Kompakt runs Android 12 (API 31); nothing here needs anything newer.
         minSdk = 31
         targetSdk = 31
-        versionCode = 18
-        versionName = "0.1.17"
+        versionCode = 19
+        versionName = "0.1.18"
 
         ndk {
             // The Kompakt is arm64. The emulator an x86_64 debug build is tried on is added
@@ -173,6 +173,10 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 
     implementation(libs.mmd)
+    implementation(libs.okhttp)
 
     testImplementation(libs.junit)
+    testImplementation(libs.okhttp.mockwebserver)
+    // The platform stubs org.json out of local unit tests; the sign-in reply is JSON.
+    testImplementation("org.json:json:20231013")
 }

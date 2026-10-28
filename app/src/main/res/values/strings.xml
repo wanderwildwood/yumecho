@@ -112,7 +112,7 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
-    <string name="about_privacy">Privacy: your voice is recorded and turned into words on this phone, and nothing leaves it. The one thing the app fetches is the speech model for a language other than English, once, which is all the internet permission is for. If you keep dreams in Notes, Notes has the words.</string>
+    <string name="about_privacy">Privacy: your voice is recorded and turned into words on this phone, and recordings never leave it. The app goes online only to fetch the speech model for a language other than English and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in is kept on this phone encrypted, and nothing is sent to the app\'s maker. If you keep dreams in Notes, Notes has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
     <string name="about_terms">Terms: this is a journal tool. It is not medical or professional advice, and the words it makes can be wrong.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
@@ -135,4 +135,50 @@
     <string name="speech_stop">Stop download</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
+    <!-- ============================================================ -->
+    <!-- Settings > Nextcloud: keeping the words in the reader's own Nextcloud -->
+
+    <string name="nc_title">Nextcloud</string>
+    <string name="nc_row_off">Off. Your dreams stay on this phone.</string>
+    <string name="nc_row_signed_in">Signed in, not sending</string>
+    <string name="nc_row_on">Sending the words of your dreams</string>
+    <string name="nc_explain">Dream Log can keep a copy of the words of your dreams in your own Nextcloud, so they survive losing this phone. It is off, and nothing leaves the phone, until you sign in here and turn on sending. Only the words go, as plain text files, never the recordings. They go over an encrypted https connection to the folder you choose.</string>
+    <string name="nc_private">Your Nextcloud password is never typed here: you sign in on Nextcloud\'s own page and it gives this phone an app password of its own, kept on the phone encrypted with a key held in its secure hardware. The files in Nextcloud are ordinary text, so anyone who can open that account can read them. With sending on, deleting a dream here deletes its copy there. Turning sending off leaves the copies already there. Nothing goes to the app\'s maker.</string>
+    <string name="nc_account">Account</string>
+    <string name="nc_signed_in">%1$s on %2$s</string>
+    <string name="nc_send">Send dreams to Nextcloud</string>
+    <string name="nc_send_what">The words of every dream, now and as they come.</string>
+    <string name="nc_behind">The last try did not get through. It tries again when a dream changes and when the app opens.</string>
+    <string name="nc_folder">Folder in Nextcloud</string>
+    <string name="nc_folder_note">The folder in your Nextcloud files the dreams go into. It is made if it is missing.</string>
+    <string name="nc_sign_out">Sign out</string>
+    <string name="nc_sign_out_armed">Sign out \u2014 tap again</string>
+    <string name="nc_sign_out_note">Stops sending and deletes this phone\'s app password, in Nextcloud and here. Copies already in Nextcloud stay.</string>
+    <string name="nc_address">Nextcloud address</string>
+    <string name="nc_address_note">As you open Nextcloud in a browser, starting https://.</string>
+    <string name="nc_not_set">Not set</string>
+    <string name="nc_sign_in">Sign in</string>
+    <string name="nc_sign_in_note">Opens Nextcloud\'s sign-in page in the browser</string>
+    <string name="nc_waiting">Waiting for the browser</string>
+    <string name="nc_waiting_note">Sign in there and grant access, then come back. Tap to stop waiting.</string>
+    <string name="nc_checking">Checking</string>
+    <string name="nc_checking_note">Trying the app password Nextcloud gave</string>
+    <string name="nc_by_hand">Sign in with an app password instead</string>
+    <string name="nc_by_hand_note">For a phone without a browser</string>
+    <string name="nc_user">Login name</string>
+    <string name="nc_user_note">The name you sign in to Nextcloud with.</string>
+    <string name="nc_app_password">App password</string>
+    <string name="nc_app_password_note">Type it, and Dream Log signs in</string>
+    <string name="nc_app_password_how">Made in Nextcloud under Settings, Security, Devices and sessions: Create new app password. Not your Nextcloud password.</string>
+    <string name="nc_plain_http">The address has to start https://. Dream Log sends nothing unencrypted.</string>
+    <string name="nc_unreachable">Nextcloud could not be reached at that address.</string>
+    <string name="nc_refused">Nextcloud did not accept the sign-in.</string>
+    <string name="nc_no_browser">There is no browser on this phone to sign in with. Type an app password instead.</string>
+    <string name="nc_not_kept">The app password could not be kept safely on this phone, so it was not kept.</string>
+    <string name="nc_timed_out">Signing in took longer than Nextcloud allows. Try again.</string>
+    <string name="nc_cancel">Cancel</string>
+    <string name="nc_save">Save</string>
+    <string name="nc_show_key">Show the key</string>
+    <string name="nc_hide_key">Hide the key</string>
+
 </resources>

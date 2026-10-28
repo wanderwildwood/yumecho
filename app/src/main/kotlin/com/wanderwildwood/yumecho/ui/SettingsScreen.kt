@@ -31,6 +31,7 @@ import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.yumecho.R
+import com.wanderwildwood.yumecho.cloud.DreamSync
 import com.wanderwildwood.yumecho.hearing.Speech
 import com.wanderwildwood.yumecho.night.DuraSpeed
 import com.wanderwildwood.yumecho.notes.InNotes
@@ -44,6 +45,12 @@ import com.wanderwildwood.yumecho.notes.InNotes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
+    var nextcloudOpen by remember { mutableStateOf(false) }
+    if (nextcloudOpen) {
+        NextcloudScreen(onBack = { nextcloudOpen = false })
+        return
+    }
+    val nextcloud by DreamSync.state.collectAsState()
     var on by remember { mutableStateOf(InNotes.on) }
     // Set while Notes is being asked, so a second press does not ask twice.
     var asking by remember { mutableStateOf(false) }
@@ -114,6 +121,28 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                     Spacer(Modifier.width(16.dp))
                     SwitchMMD(checked = on, onCheckedChange = null)
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable { nextcloudOpen = true }
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                ) {
+                    TextMMD(text = stringResource(R.string.nc_title), style = MaterialTheme.typography.bodyLarge)
+                    TextMMD(
+                        text = stringResource(
+                            when {
+                                nextcloud.user == null -> R.string.nc_row_off
+                                nextcloud.on -> R.string.nc_row_on
+                                else -> R.string.nc_row_signed_in
+                            },
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                    )
                 }
                 Spacer(Modifier.height(12.dp))
             }

@@ -22,6 +22,9 @@ import com.wanderwildwood.yumecho.dreams.exportText
 import com.wanderwildwood.yumecho.hearing.Transcriber
 import com.wanderwildwood.yumecho.night.ArmService
 import com.wanderwildwood.yumecho.notes.InNotes
+import com.wanderwildwood.yumecho.cloud.DreamSync
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import com.wanderwildwood.yumecho.night.Night
 import com.wanderwildwood.yumecho.ui.AboutDialog
 import com.wanderwildwood.yumecho.ui.DreamScreen
@@ -44,9 +47,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Dreams.init(this)
         InNotes.init(this)
+        DreamSync.init(this)
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
-                DreamLog()
+            // A steady cursor: nothing on an e-ink screen should blink.
+            CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
+                ThemeMMD(colorScheme = monochrome) {
+                    DreamLog()
+                }
             }
         }
     }
@@ -56,6 +63,7 @@ class MainActivity : ComponentActivity() {
         // Anything left unheard, because the phone was switched off or the app was stopped
         // partway, is picked up whenever the app is opened.
         Dreams.refresh()
+        DreamSync.syncNow()
         Transcriber.catchUp(this)
     }
 }

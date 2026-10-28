@@ -167,6 +167,7 @@ class ArmService : Service() {
         super.onCreate()
         Dreams.init(this)
         InNotes.init(this)
+        com.wanderwildwood.yumecho.cloud.DreamSync.init(this)
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yumecho:recording")
         recorder = Recorder { _, _ ->

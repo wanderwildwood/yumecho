@@ -5,9 +5,10 @@
          turned into words on the phone. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- For one thing only: downloading the listening model for a language other than
-         English, when that is chosen in the settings (hearing/Speech.kt). Nothing the app
-         records or writes is ever sent anywhere. -->
+    <!-- Two things, both the reader's choice: downloading the listening model for a language
+         other than English (hearing/Speech.kt), and, only if switched on in Settings, sending
+         the words of dreams (never the recordings) to the reader's own Nextcloud over https
+         (cloud/). Nothing else is ever sent, and nothing at all by default. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Armed for the night is a foreground service: it has to keep hearing the volume
@@ -31,7 +32,7 @@
             <data android:mimeType="text/plain" />
         </intent>
         <!-- Notes, for "Keep dreams in Notes": its provider is invisible to this app without
-             this. Notes does any syncing; this app still has no network permission. -->
+             this. Notes does its own syncing. -->
         <package android:name="com.wanderwildwood.oboegaki" />
     </queries>
 

@@ -1,13 +1,16 @@
 # Privacy
 
 Dream Log records you in bed, turns what you say into words, and keeps both on the phone. It
-never sends any of it anywhere. The one exception is yours to make: "Keep dreams in Notes"
-hands the words, not the recordings, to Notes on the same phone, which keeps and syncs them as
-it does your other notes.
+never sends any of it anywhere unless you ask. There are two exceptions, both yours to make.
+"Keep dreams in Notes" hands the words, not the recordings, to Notes on the same phone, which
+keeps and syncs them as it does your other notes. "Nextcloud", under Settings, sends the words,
+not the recordings, to your own Nextcloud server, and only after you sign in to it and turn
+sending on.
 
-The app goes online for one thing only, and only if you ask: to download the listening model
-for a language other than English. That is a download, nothing goes up, and with English (the
-default) the app never opens a connection at all.
+The app goes online for two things only, and only if you ask: to download the listening model
+for a language other than English (a download; nothing goes up), and to send the words of your
+dreams to the Nextcloud you signed in to. With English and Nextcloud left off (the defaults) the
+app never opens a connection at all.
 
 That is the whole policy. The rest of this page is the evidence for it, because a privacy
 policy that cannot be checked is just a promise.
@@ -32,12 +35,14 @@ volume key, not to the room.
 The speech recognition is whisper.cpp, running on the phone's own processor. It is not a
 service. The English model is packed inside the app.
 
-`INTERNET` is there for the other languages, since Dream Log 0.1.5. Choosing one in the
+`INTERNET` is there for the other languages, since Dream Log 0.1.5, and, since 0.1.18, for the
+Nextcloud sending described below. Choosing a language in the
 settings downloads Whisper's multilingual model, about 60 MB, from Hugging Face, at an address
 pinned to one fixed version of the file (`hearing/Speech.kt`). It is a plain download: the
 request carries nothing of yours, and the app keeps the file only if its SHA-256 matches the one
-written in the app. That is the only network code in the app; search the source for `URL(` or
-`HttpURLConnection` and it is the one place. Choosing English again deletes the file.
+written in the app. The download is `hearing/Speech.kt`, using `HttpURLConnection`; the Nextcloud
+code is the `cloud/` folder, using OkHttp. Those are the only two places that touch the network.
+Choosing English again deletes the file.
 
 ## What is stored, and where
 
@@ -77,9 +82,37 @@ Notes accepts them only from the released Dream Log. To see that it can, the man
 see Notes (`<package android:name="com.wanderwildwood.oboegaki"/>` in `<queries>`) and the apps
 that act on selected text, such as the Dictionary. Neither is a permission.
 
+## Sending the words to your Nextcloud
+
+Off until you open Settings > Nextcloud, sign in, and turn on "Send dreams to Nextcloud".
+Signing in alone sends nothing.
+
+- **What goes:** each dream's words with its night, time and length, as a Markdown file named
+  for when the recording began (`Dream Log/2026-10-05 0712.md`, the folder is yours to rename).
+  Never a recording. Nothing else is sent: no device id, no log of when the app was armed.
+- **Where:** only the server address you typed, over https. A plain `http://` address is
+  refused, and Android blocks unencrypted traffic for this app as a whole. Nothing goes to the
+  app's maker or anyone else.
+- **Signing in:** Nextcloud's own login page in the browser (Login Flow v2). Your Nextcloud
+  password is never typed into the app; Nextcloud hands the phone an app password of its own,
+  which you can revoke in Nextcloud's security settings. A phone with no browser can be given
+  an app password by hand.
+- **Kept on the phone:** the server, login name and app password, in the app's private
+  preferences, with the password sealed (AES-GCM) by a key in the Android Keystore that cannot
+  be exported and is not backed up (`cloud/Secrets.kt`). If that key is lost the app behaves as
+  signed out. `android:allowBackup="false"` keeps all of it out of cloud backups.
+- **Kept on the server:** the files are ordinary text, readable by anyone who can open that
+  Nextcloud account, and as protected as the rest of that account is. They are not encrypted by
+  the app, so that Notes, a text editor or a new phone can read them.
+- **Deleting:** with sending on, deleting a dream deletes its copy on the server. Turning
+  sending off, or signing out, leaves the copies already there. Signing out also deletes the
+  app password on the server.
+- **Calls:** `PROPFIND`, `MKCOL`, `PUT` and `DELETE` on `remote.php/dav/files/<you>/<folder>/`,
+  and Login Flow v2's `index.php/login/v2` and `ocs/v2.php/core/apppassword`.
+
 ## No third-party services
 
-No analytics, no advertising, no crash reporting. The dependencies are AndroidX and Jetpack
+No analytics, no advertising, no crash reporting. The dependencies are AndroidX, OkHttp (for the Nextcloud calls) and Jetpack
 Compose, Mudita's [MMD](https://github.com/mudita/MMD) design system, and whisper.cpp, which
 is compiled into the app from source in this repository.
 
@@ -88,7 +121,7 @@ is compiled into the app from source in this repository.
 You do not have to take any of it on trust:
 
 - The source is at <https://github.com/wanderwildwood/yumecho> and each release is tagged.
-- `grep uses-permission app/src/main/AndroidManifest.xml` returns the four lines above.
+- `grep uses-permission app/src/main/AndroidManifest.xml` returns the lines above.
 - Any APK can be checked with `aapt dump permissions` or by opening it as a zip. It will also
   list `com.wanderwildwood.yumecho.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, which AndroidX
   adds to every app that listens for a system broadcast. It is the app's own, and no other app
