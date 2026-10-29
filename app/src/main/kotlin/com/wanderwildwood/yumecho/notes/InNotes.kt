@@ -41,7 +41,7 @@ object InNotes {
     private const val PATH = "path:"
 
     /** What Notes said when asked. */
-    enum class Answer { OK, NOT_INSTALLED, NOT_SET_UP, REFUSED, FAILED }
+    enum class Answer { OK, NOT_INSTALLED, TOO_OLD, NOT_SET_UP, REFUSED, FAILED }
 
     private lateinit var app: Context
     private lateinit var prefs: SharedPreferences
@@ -113,18 +113,26 @@ object InNotes {
         Log.w(TAG, "$method: $said; will try again when the log next changes")
     }
 
+    /** Tells an absent Notes from one too old to have the provider. */
+    private fun missing(): Answer = try {
+        app.packageManager.getPackageInfo("com.wanderwildwood.oboegaki", 0)
+        Answer.TOO_OLD
+    } catch (e: Exception) {
+        Answer.NOT_INSTALLED
+    }
+
     private fun call(method: String, arg: String?, extras: Bundle? = null): Answer {
         val reply = try {
             app.contentResolver.call(PROVIDER, method, arg, extras)
         } catch (e: IllegalArgumentException) {
             // "Unknown authority": Notes is not installed, or is a version without the provider.
-            return Answer.NOT_INSTALLED
+            return missing()
         } catch (e: SecurityException) {
             return Answer.REFUSED
         } catch (e: Exception) {
             Log.w(TAG, "$method failed", e)
             return Answer.FAILED
-        } ?: return Answer.NOT_INSTALLED
+        } ?: return missing()
         if (reply.getBoolean("ok", false)) return Answer.OK
         return when (reply.getString("reason")) {
             "not_set_up" -> Answer.NOT_SET_UP

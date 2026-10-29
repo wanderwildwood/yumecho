@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,6 +57,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * While armed and on screen, a volume key is the press, however the phone's keys are set:
+     * on a Kompakt they move the ringer, which the system's own route to the app never sees.
+     * Taken here, the key moves no volume and shows no slider.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (Night.state.value != Night.State.RESTING) {
+                if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) ArmService.press(this)
+                return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onResume() {

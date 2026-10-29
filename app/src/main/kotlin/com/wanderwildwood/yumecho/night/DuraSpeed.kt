@@ -1,8 +1,11 @@
 package com.wanderwildwood.yumecho.night
 
+import android.app.ActivityManager
+import android.app.ApplicationExitInfo
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 
 /**
@@ -36,12 +39,47 @@ object DuraSpeed {
             ?: Settings.System.getString(cr, "setting.duraspeed.enabled"))?.let { it != "0" }
     }.getOrNull()
 
+    private const val PREFS = "duraspeed"
+    private const val ALLOWED = "allowed"
+    private const val STOP_SEEN = "stop_seen"
+
+    private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
     /**
-     * Whether an armed night may be cut short: the Settings rows show while this is so. DuraSpeed's
-     * list of apps cannot be read, so Dream Log being on it cannot be checked, and the hint
-     * shows whenever DuraSpeed is on this phone and not switched off.
+     * Whether an armed night may be cut short, so the Settings hint shows. It hides only when
+     * DuraSpeed is not on this phone, is switched off, or the person said Dream Log is on its
+     * list and nothing has stopped the app since. The list cannot be read, so the word is all
+     * there is to go on; a stop by the system while DuraSpeed is on takes the word back.
      */
-    fun atRisk(context: Context): Boolean = present(context) && isOn(context) != false
+    fun atRisk(context: Context): Boolean {
+        if (!present(context)) return false
+        val on = isOn(context) != false
+        val prefs = prefs(context)
+        val stop = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            runCatching {
+                context.getSystemService(ActivityManager::class.java)
+                    .getHistoricalProcessExitReasons(context.packageName, 0, 0)
+            }.getOrDefault(emptyList())
+                .filter {
+                    it.reason == ApplicationExitInfo.REASON_USER_REQUESTED &&
+                        it.description?.contains("due to from pid") == true
+                }
+                .maxOfOrNull { it.timestamp }
+        } else {
+            null
+        }
+        if (stop != null && stop > prefs.getLong(STOP_SEEN, 0)) {
+            prefs.edit().putLong(STOP_SEEN, stop).apply()
+            // Only a stop while DuraSpeed is on is DuraSpeed's.
+            if (on) prefs.edit().putBoolean(ALLOWED, false).apply()
+        }
+        return on && !prefs.getBoolean(ALLOWED, false)
+    }
+
+    /** The person's word that Dream Log is switched on in DuraSpeed's list. */
+    fun markAllowed(context: Context) {
+        prefs(context).edit().putBoolean(ALLOWED, true).apply()
+    }
 
     fun appInfo(): Intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         .setData(Uri.parse("package:$PACKAGE"))

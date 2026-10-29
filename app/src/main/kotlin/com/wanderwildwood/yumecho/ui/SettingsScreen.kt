@@ -57,7 +57,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current
     remember { Speech.init(context) }
-    val duraSpeedRisk = remember { DuraSpeed.atRisk(context) }
+    var duraSpeedRisk by remember { mutableStateOf(DuraSpeed.atRisk(context)) }
     fun open(intent: android.content.Intent) = runCatching {
         context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
     }
@@ -77,7 +77,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     ) { contentPadding ->
         PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
             // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
-            // night is spent. Its list cannot be read, so the hint always shows. (Dream Log is on it can't be read, so the hint always shows.
+            // night is spent. Its list cannot be read, so the hint hides only on the person's
+            // word that Dream Log is on it, and comes back if the system stops the app.
             if (duraSpeedRisk) {
                 item {
                     Column(
@@ -88,6 +89,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                     ) {
                         TextMMD(text = stringResource(R.string.settings_duraspeed_open), style = MaterialTheme.typography.bodyLarge)
                         TextMMD(text = stringResource(R.string.settings_duraspeed), style = MaterialTheme.typography.labelSmall)
+                    }
+                    Text48(stringResource(R.string.settings_duraspeed_done)) {
+                        DuraSpeed.markAllowed(context)
+                        duraSpeedRisk = false
                     }
                     Spacer(Modifier.height(12.dp))
                 }
@@ -203,6 +208,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 text = stringResource(
                     when (answer) {
                         InNotes.Answer.NOT_INSTALLED -> R.string.settings_notes_missing
+                        InNotes.Answer.TOO_OLD -> R.string.settings_notes_too_old
                         InNotes.Answer.NOT_SET_UP -> R.string.settings_notes_not_set_up
                         InNotes.Answer.REFUSED -> R.string.settings_notes_refused
                         else -> R.string.settings_notes_failed
@@ -256,6 +262,24 @@ private fun SpeechDialog(current: String, downloaded: Boolean, onDone: (String?)
             ButtonMMD(onClick = { onDone(ask.code) }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 TextMMD(text = stringResource(R.string.speech_download))
             }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButtonMMD(onClick = { onDone(null) }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                TextMMD(text = stringResource(R.string.speech_cancel))
+            }
         }
     }
+}
+
+/** A plain row of words that does one thing when pressed, at least 48 dp tall. */
+@Composable
+private fun Text48(text: String, onClick: () -> Unit) {
+    TextMMD(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+    )
 }

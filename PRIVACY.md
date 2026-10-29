@@ -110,6 +110,12 @@ Signing in alone sends nothing.
 - **Calls:** `PROPFIND`, `MKCOL`, `PUT` and `DELETE` on `remote.php/dav/files/<you>/<folder>/`,
   and Login Flow v2's `index.php/login/v2` and `ocs/v2.php/core/apppassword`.
 
+## Reading the app's own stops
+
+On a Kompakt, Settings can show a hint about DuraSpeed, the phone's background manager. To tell
+whether the system has stopped the app since you said it was switched on, the app reads its own
+exit history from Android (`ActivityManager`). That stays on the phone and is never sent.
+
 ## No third-party services
 
 No analytics, no advertising, no crash reporting. The dependencies are AndroidX, OkHttp (for the Nextcloud calls) and Jetpack

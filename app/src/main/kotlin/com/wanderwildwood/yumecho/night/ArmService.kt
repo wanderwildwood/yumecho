@@ -57,6 +57,17 @@ class ArmService : Service() {
         fun arm(context: Context) =
             ContextCompat.startForegroundService(context, Intent(context, ArmService::class.java))
 
+        private const val PRESS = "yumecho.PRESS"
+
+        /**
+         * A volume key pressed while the app itself is on screen: the screen gets the key before
+         * the system does, so it is handed here whichever volume the phone's keys move.
+         */
+        fun press(context: Context) {
+            if (Night.current.value == Night.State.RESTING) return
+            context.startService(Intent(context, ArmService::class.java).setAction(PRESS))
+        }
+
         fun disarm(context: Context) {
             context.stopService(Intent(context, ArmService::class.java))
         }
@@ -181,6 +192,10 @@ class ArmService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == PRESS) {
+            if (armed) pressed()
+            return START_NOT_STICKY
+        }
         startForeground(
             1, notification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
         )

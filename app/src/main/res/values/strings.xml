@@ -77,6 +77,7 @@
     <!-- Settings -->
 
     <string name="settings_title">Settings</string>
+    <string name="settings_duraspeed_done">It\'s switched on</string>
     <string name="settings_duraspeed_open">Open DuraSpeed</string>
     <string name="settings_duraspeed">The phone\'s DuraSpeed setting can shut Dream Log down in the night, so a press is never heard. Open DuraSpeed, tap Open, and switch Dream Log on.</string>
     <!-- Top bar button, read aloud by a screen reader -->
@@ -86,7 +87,9 @@
     <!-- Under the switch -->
     <string name="settings_notes_what">Each dream\'s words as a note in a Dreams folder. The recordings stay here.</string>
     <!-- Said when the switch is pressed and Notes is not on the phone, or is too old to take dreams -->
-    <string name="settings_notes_missing">Notes is not on this phone, or is a version that cannot take dreams yet.</string>
+    <string name="settings_notes_missing">Notes is not installed on this phone.</string>
+    <!-- Said when Notes is installed but its version has no way of taking dreams -->
+    <string name="settings_notes_too_old">Notes is installed, but this version cannot take dreams. Update Notes and try again.</string>
     <!-- Said when Notes is on the phone but has not been given a place to keep notes -->
     <string name="settings_notes_not_set_up">Notes has nowhere to keep notes yet. Open Notes and choose a place first.</string>
     <!-- Said when Notes will not take dreams from this copy of Dream Log -->
@@ -112,12 +115,17 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
-    <string name="about_privacy">Privacy: your voice is recorded and turned into words on this phone, and recordings never leave it. The app goes online only to fetch the speech model for a language other than English and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in is kept on this phone encrypted, and nothing is sent to the app\'s maker. If you keep dreams in Notes, Notes has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
-    <string name="about_terms">Terms: this is a journal tool. It is not medical or professional advice, and the words it makes can be wrong.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy">Your dreams stay on this phone. The microphone is used only while you are recording, and recordings never leave the phone.</string>
+    <string name="about_privacy_net">The app goes online only to fetch the speech model for a language other than English, a download that carries nothing you have recorded, and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in details are kept on this phone encrypted, and nothing is sent to the app\'s maker.</string>
+    <string name="about_privacy_rest">If you keep dreams in Notes, Notes has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
+    <string name="about_terms_title">Terms</string>
+    <string name="about_terms">This app is free software under the GNU General Public License v3. It comes with no warranty: use it at your own risk. It is a journal tool, not medical or professional advice, and the words it makes can be wrong.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
     <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
+    <string name="about_libraries">Mudita Mindful Design (MMD), Jetpack Compose and AndroidX, Kotlin and its libraries, all Apache License 2.0. OkHttp, Apache License 2.0. Lato typeface, SIL Open Font License 1.1.</string>
     <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
     <string name="about_feed_the_llamas">feed the llamas</string>
     <!-- Said when the phone has nothing that can open a web address -->
@@ -133,6 +141,7 @@
     <string name="speech_current">%1$s (current)</string>
     <string name="speech_stop_ask">Stop the download? The language stays as it is.</string>
     <string name="speech_stop">Stop download</string>
+    <string name="speech_cancel">Cancel</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
     <!-- ============================================================ -->
