@@ -50,7 +50,7 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
 - **The words can be looked up.** A dream's words are selectable, and the menu over them has
   Define, from the Dictionary, behind its ⋮.
 
-That is the only setting.
+Settings holds those two switches, the Nextcloud sign-in, and the language dreams are heard in.
 
 ### Why a volume key
 
