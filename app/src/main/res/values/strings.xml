@@ -26,6 +26,8 @@
     <string name="log_mic_why">Dream Log needs the microphone to record what you say. The recordings stay on this phone and are never sent anywhere.</string>
     <!-- Button that asks for the microphone permission (verb) -->
     <string name="log_allow">Allow</string>
+    <string name="log_open_settings">Open app settings</string>
+    <string name="log_mic_off">The microphone is switched off for Dream Log, and the phone will not ask again. Allow it under Permissions in the app\'s settings, then come back.</string>
 
     <string name="log_empty">No dreams yet.</string>
 
@@ -171,7 +173,7 @@
     <string name="nc_waiting">Waiting for the browser</string>
     <string name="nc_waiting_note">Sign in there and grant access, then come back. Tap to stop waiting.</string>
     <string name="nc_checking">Checking</string>
-    <string name="nc_checking_note">Trying the app password Nextcloud gave</string>
+    <string name="nc_checking_note">Trying the app password Nextcloud gave. Tap to cancel.</string>
     <string name="nc_by_hand">Sign in with an app password instead</string>
     <string name="nc_by_hand_note">For a phone without a browser</string>
     <string name="nc_user">Login name</string>
@@ -185,6 +187,9 @@
     <string name="nc_no_browser">There is no browser on this phone to sign in with. Type an app password instead.</string>
     <string name="nc_not_kept">The app password could not be kept safely on this phone, so it was not kept.</string>
     <string name="nc_timed_out">Signing in took longer than Nextcloud allows. Try again.</string>
+    <string name="nc_bad_link">The server sent a sign-in page on another address, or one that is not https, so it was not opened. Type an app password instead.</string>
+    <string name="nc_needs_address">Set the Nextcloud address first.</string>
+    <string name="nc_needs_user">Set the login name first, then the app password.</string>
     <string name="nc_cancel">Cancel</string>
     <string name="nc_save">Save</string>
     <string name="nc_show_key">Show the key</string>
@@ -196,4 +201,16 @@
     <string name="folio_page">Page %1$d of %2$d</string>
     <string name="folio_go">Go</string>
     <string name="folio_cancel">Cancel</string>
+    <string name="about_licences">Licences</string>
+    <string name="licences_title">Licences</string>
+    <string name="licences_source_head">Source code</string>
+    <string name="licences_licence_head">Licence</string>
+    <string name="licences_licence">Dream Log is free software under the GNU General Public License, version 3 only (GPL-3.0-only), copyright wander wildwood, for what is written here. Speech recognition is whisper.cpp, compiled in under its own MIT licence (the notice also sits in the app\'s assets). The work it is built on keeps its own licence and its authors keep their copyright, as listed under Built with. The full text of each licence is at the end of this page.</string>
+    <string name="licences_built_head">Built with</string>
+    <string name="licences_back">Back</string>
+    <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
+    <string name="licences_gpl">GNU General Public License, version 3</string>
+    <string name="licences_apache">Apache License, version 2.0</string>
+    <string name="licences_mit">MIT License</string>
+    <string name="licences_ofl">SIL Open Font License, version 1.1</string>
 </resources>

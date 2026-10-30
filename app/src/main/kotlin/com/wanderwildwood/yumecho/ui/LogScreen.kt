@@ -45,6 +45,7 @@ fun LogScreen(
     dreams: List<Dream>,
     hearing: String?,
     micAllowed: Boolean,
+    micRefused: Boolean = false,
     onArm: () -> Unit,
     onDisarm: () -> Unit,
     onOpen: (Dream) -> Unit,
@@ -72,7 +73,7 @@ fun LogScreen(
         ) {
             Column(Modifier.padding(horizontal = 20.dp)) {
                 Spacer(Modifier.height(16.dp))
-                Arming(night, micAllowed, onArm, onDisarm)
+                Arming(night, micAllowed, micRefused, onArm, onDisarm)
                 Spacer(Modifier.height(16.dp))
                 HorizontalDividerMMD()
 
@@ -109,15 +110,15 @@ fun LogScreen(
 }
 
 @Composable
-private fun Arming(night: Night.State, micAllowed: Boolean, onArm: () -> Unit, onDisarm: () -> Unit) {
+private fun Arming(night: Night.State, micAllowed: Boolean, micRefused: Boolean, onArm: () -> Unit, onDisarm: () -> Unit) {
     when (night) {
         Night.State.RESTING -> {
             ButtonMMD(onClick = onArm, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-                TextMMD(text = stringResource(if (micAllowed) R.string.log_arm else R.string.log_allow))
+                TextMMD(text = stringResource(if (micAllowed) R.string.log_arm else if (micRefused) R.string.log_open_settings else R.string.log_allow))
             }
             Spacer(Modifier.height(10.dp))
             TextMMD(
-                text = stringResource(if (micAllowed) R.string.log_how else R.string.log_mic_why),
+                text = stringResource(if (micAllowed) R.string.log_how else if (micRefused) R.string.log_mic_off else R.string.log_mic_why),
                 style = MaterialTheme.typography.labelSmall,
             )
         }

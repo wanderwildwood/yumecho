@@ -55,7 +55,10 @@ object Dreams {
 
     @Synchronized
     fun refresh() {
-        all.value = dir.listFiles { f -> f.name.endsWith(".wav") }.orEmpty().mapNotNull { wav ->
+        // A listing that failed (null) is not an empty log: keep what was known, or a transient
+        // storage error would read as "every dream is gone" and delete the Nextcloud copies.
+        val files = dir.listFiles { f -> f.name.endsWith(".wav") } ?: return
+        all.value = files.mapNotNull { wav ->
             val stamp = wav.name.removeSuffix(".wav")
             val time = runCatching { LocalDateTime.parse(stamp, Dream.STAMP) }.getOrNull()
                 ?: return@mapNotNull null

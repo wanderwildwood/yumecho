@@ -23,6 +23,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <queries>
+        <!-- Browsers: a web address opens in a real one, never in the system's bare WebView shell. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
         <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
         <package android:name="com.mediatek.duraspeed" />
         <!-- Lets the menu over a dream's words list other apps' text actions, such as Define

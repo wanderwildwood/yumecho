@@ -1,6 +1,12 @@
 package com.wanderwildwood.yumecho
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.provider.Settings
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -119,9 +125,27 @@ private fun DreamLog() {
         }
     }
 
+    // Once the phone stops asking (two refusals), a press of the button does nothing at all, so the
+    // button becomes the way to the app's settings instead.
+    var micRefused by remember { mutableStateOf(false) }
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         micAllowed = granted
+        micRefused = !granted && !(context as Activity).shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
         if (granted) ArmService.arm(context)
+    }
+
+    // Granted in Settings while the app was away: the screen takes it up on return.
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val watcher = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val now = context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                micAllowed = now
+                if (now) micRefused = false
+            }
+        }
+        lifecycle.addObserver(watcher)
+        onDispose { lifecycle.removeObserver(watcher) }
     }
 
     val dream = dreams.firstOrNull { it.stamp == open }
@@ -145,8 +169,17 @@ private fun DreamLog() {
             dreams = dreams,
             hearing = hearing,
             micAllowed = micAllowed,
+            micRefused = micRefused,
             onArm = {
-                if (micAllowed) ArmService.arm(context) else ask.launch(Manifest.permission.RECORD_AUDIO)
+                if (micAllowed) {
+                    ArmService.arm(context)
+                } else if (micRefused) {
+                    context.startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.packageName)),
+                    )
+                } else {
+                    ask.launch(Manifest.permission.RECORD_AUDIO)
+                }
             },
             onDisarm = { ArmService.disarm(context) },
             onOpen = { open = it.stamp },

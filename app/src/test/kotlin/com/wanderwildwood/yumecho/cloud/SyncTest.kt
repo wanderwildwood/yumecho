@@ -257,3 +257,52 @@ class SyncTest {
         assertEquals(listOf(Entry("/remote.php/dav/files/ann/Dream Log/", -1, true), Entry("/remote.php/dav/files/ann/Dream Log/a b.md", 12, false)), entries)
     }
 }
+
+class SyncGuardTest {
+    private fun dream(stamp: String, text: String?) =
+        Dream(stamp, LocalDateTime.parse(stamp, Dream.STAMP), 30, text)
+
+    private val sent = mapOf(
+        "20261001-010101" to Sent("2026-10-01 0101.md", "x"),
+        "20261002-010101" to Sent("2026-10-02 0101.md", "y"),
+        "20261003-010101" to Sent("2026-10-03 0101.md", "z"),
+    )
+
+    @Test
+    fun `an empty log never plans to delete several copies`() {
+        assertTrue(plan(emptyList(), sent) { "" }.none { it is Step.Remove })
+        assertFalse(removalsAreSafe(emptyList(), sent))
+    }
+
+    @Test
+    fun `the last copy still goes when its one dream is deleted`() {
+        val one = mapOf("20261001-010101" to Sent("2026-10-01 0101.md", "x"))
+        assertEquals(listOf<Step>(Step.Remove("20261001-010101", "2026-10-01 0101.md")), plan(emptyList(), one) { "" })
+    }
+
+    @Test
+    fun `with some dreams still listed a gone one is removed`() {
+        val kept = dream("20261001-010101", "a")
+        val steps = plan(listOf(kept), sent) { "a" }
+        assertEquals(setOf("20261002-010101", "20261003-010101"), steps.filterIsInstance<Step.Remove>().map { it.stamp }.toSet())
+    }
+
+    @Test
+    fun `the login page must be https on the typed host`() {
+        assertTrue(LoginFlow.acceptableLoginUrl("https://cloud.example/index.php/login/v2/flow/abc", "cloud.example"))
+        assertTrue(LoginFlow.acceptableLoginUrl("https://Cloud.Example/login", "https://cloud.example/"))
+        assertFalse(LoginFlow.acceptableLoginUrl("http://cloud.example/login", "cloud.example"))
+        assertFalse(LoginFlow.acceptableLoginUrl("https://evil.example/login", "cloud.example"))
+        assertFalse(LoginFlow.acceptableLoginUrl("intent://scan/#Intent;scheme=zxing;end", "cloud.example"))
+        assertFalse(LoginFlow.acceptableLoginUrl("javascript:alert(1)", "cloud.example"))
+        assertFalse(LoginFlow.acceptableLoginUrl("", "cloud.example"))
+    }
+
+    @Test
+    fun `signing in by hand says what is missing`() {
+        assertEquals(Problem.NEEDS_ADDRESS, handProblem("", "ann", "pw"))
+        assertEquals(Problem.PLAIN_HTTP, handProblem("http://cloud.example", "ann", "pw"))
+        assertEquals(Problem.NEEDS_USER, handProblem("cloud.example", "", "pw"))
+        assertEquals(null, handProblem("cloud.example", "ann", "pw"))
+    }
+}

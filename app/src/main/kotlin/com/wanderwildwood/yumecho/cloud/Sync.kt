@@ -21,6 +21,14 @@ fun fingerprint(text: String): String =
         .joinToString("") { "%02x".format(it) }
 
 /**
+ * Whether the copies in Nextcloud of dreams missing from the log may be removed. An empty log
+ * that is answering for several copies is what a failed read of the phone's storage looks like,
+ * and acting on it would delete every copy: so nothing is removed then. One dream deleted by the
+ * reader still removes its own copy, including the last one.
+ */
+fun removalsAreSafe(dreams: List<Dream>, sent: Map<String, Sent>): Boolean = dreams.isNotEmpty() || sent.size <= 1
+
+/**
  * What it takes to make the folder match the log: a copy of every dream that has words and has
  * not been sent, or whose words have changed since; and the removal of the copy of every dream
  * that is gone. A dream keeps the name it was first sent under, so nothing is renamed. Names
@@ -31,7 +39,7 @@ fun fingerprint(text: String): String =
 fun plan(dreams: List<Dream>, sent: Map<String, Sent>, render: (Dream) -> String): List<Step> {
     val steps = mutableListOf<Step>()
     val here = dreams.mapTo(HashSet()) { it.stamp }
-    for ((stamp, was) in sent) if (stamp !in here) steps += Step.Remove(stamp, was.name)
+    if (removalsAreSafe(dreams, sent)) for ((stamp, was) in sent) if (stamp !in here) steps += Step.Remove(stamp, was.name)
     val taken = sent.values.mapTo(HashSet()) { it.name }
     for (dream in dreams) {
         if (!worthANote(dream)) continue

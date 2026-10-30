@@ -24,13 +24,13 @@ class Refused(message: String) : IOException(message)
 internal const val AGENT = "Dream Log (yumecho)"
 
 /**
- * One client for every Nextcloud call. The read timeout is long because a PUT of a video is
- * answered only once the server has written all of it.
+ * One client for every Nextcloud call. Only a few lines of text ever go up, so thirty seconds
+ * without an answer is a dead server, not a slow write; the sign-in check can also be cancelled.
  */
 internal val http = OkHttpClient.Builder()
     .connectTimeout(15, TimeUnit.SECONDS)
-    .readTimeout(120, TimeUnit.SECONDS)
-    .writeTimeout(120, TimeUnit.SECONDS)
+    .readTimeout(30, TimeUnit.SECONDS)
+    .writeTimeout(30, TimeUnit.SECONDS)
     .build()
 
 /**
@@ -87,6 +87,18 @@ object LoginFlow {
             null
         }
     }
+
+    /**
+     * Whether the sign-in page a server named may be opened: https only (this app sends nothing
+     * unencrypted), and on the same host as the address that was typed. A server that points the
+     * phone somewhere else, or at another kind of link, is not followed.
+     */
+    fun acceptableLoginUrl(loginUrl: String, typed: String): Boolean = runCatching {
+        val login = java.net.URI(loginUrl.trim())
+        val wanted = java.net.URI(normalise(typed))
+        login.scheme.equals("https", ignoreCase = true) &&
+            !login.host.isNullOrEmpty() && login.host.equals(wanted.host, ignoreCase = true)
+    }.getOrDefault(false)
 
     /** What was typed, as an address: "cloud.example" becomes "https://cloud.example". */
     fun normalise(server: String): String {

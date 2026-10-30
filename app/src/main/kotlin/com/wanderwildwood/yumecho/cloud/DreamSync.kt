@@ -3,11 +3,13 @@ package com.wanderwildwood.yumecho.cloud
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.noteText
+import com.wanderwildwood.yumecho.ui.isRealBrowser
 import com.wanderwildwood.yumecho.ui.nightHeadingInFile
 import com.wanderwildwood.yumecho.ui.timeAndLengthInFile
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +25,19 @@ import java.util.concurrent.Executors
 
 enum class SignIn { IDLE, WAITING, CHECKING }
 
-enum class Problem { PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT }
+enum class Problem { PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT, BAD_LINK, NEEDS_ADDRESS, NEEDS_USER }
+
+/**
+ * Why signing in by hand cannot go ahead yet, or null when it can. Said on screen: a form that
+ * closes without a word leaves the reader guessing.
+ */
+fun handProblem(typed: String, user: String, appPassword: String): Problem? = when {
+    typed.isBlank() -> Problem.NEEDS_ADDRESS
+    LoginFlow.isPlain(typed) -> Problem.PLAIN_HTTP
+    user.isBlank() -> Problem.NEEDS_USER
+    appPassword.isBlank() -> Problem.NEEDS_USER
+    else -> null
+}
 
 /** What Settings shows about Nextcloud. */
 data class SyncState(
@@ -70,6 +84,12 @@ object DreamSync {
     private val _state = MutableStateFlow(SyncState())
     val state: StateFlow<SyncState> = _state
     private var signingIn: Job? = null
+
+    /** Counts sign-in tries, so a try that was cancelled while checking is dropped when it ends. */
+    @Volatile private var attempt = 0
+
+    /** Its own dispatcher, so cancelling a sign-in check cannot touch the calls that send dreams. */
+    private val checkClient = http.newBuilder().dispatcher(okhttp3.Dispatcher()).build()
 
     @Synchronized
     fun init(context: Context) {
@@ -160,6 +180,8 @@ object DreamSync {
 
     fun setAddress(typed: String) = _state.update { it.copy(typed = typed.trim(), problem = null) }
 
+    fun clearProblem() = _state.update { it.copy(problem = null) }
+
     fun byHand(on: Boolean) = _state.update { it.copy(byHand = on, problem = null) }
 
     /**
@@ -179,9 +201,16 @@ object DreamSync {
                 _state.update { it.copy(signIn = SignIn.IDLE, problem = if (e is Refused) Problem.REFUSED else Problem.UNREACHABLE) }
                 return@launch
             }
-            val opened = runCatching {
-                app.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(started.loginUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            }.isSuccess
+            if (!LoginFlow.acceptableLoginUrl(started.loginUrl, typed)) {
+                _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK, byHand = true) }
+                return@launch
+            }
+            val login = Intent(Intent.ACTION_VIEW, Uri.parse(started.loginUrl))
+                .addCategory(Intent.CATEGORY_BROWSABLE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // Only a real browser: the system's bare WebView shell answers a web address and then crashes.
+            val handler = app.packageManager.resolveActivity(login, PackageManager.MATCH_DEFAULT_ONLY)
+            val opened = isRealBrowser(handler?.activityInfo?.packageName) &&
+                runCatching { app.startActivity(login) }.isSuccess
             if (!opened) {
                 _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.NO_BROWSER, byHand = true) }
                 return@launch
@@ -205,27 +234,34 @@ object DreamSync {
     }
 
     fun cancelSignIn() {
+        attempt++
         signingIn?.cancel()
+        // A check already under way stops now rather than when the server answers or gives up.
+        checkClient.dispatcher.cancelAll()
         _state.update { it.copy(signIn = SignIn.IDLE) }
     }
 
     /** For a phone with no browser: a login name and an app password made on the server by hand. */
     fun signInByHand(user: String, appPassword: String) {
         val typed = _state.value.typed
-        if (typed.isBlank() || user.isBlank() || appPassword.isBlank()) return
-        if (LoginFlow.isPlain(typed)) {
-            _state.update { it.copy(problem = Problem.PLAIN_HTTP) }
+        val missing = handProblem(typed, user, appPassword)
+        if (missing != null) {
+            _state.update { it.copy(problem = missing) }
             return
         }
         signingIn = scope.launch { keep(Account(LoginFlow.normalise(typed), user.trim(), appPassword.trim())) }
     }
 
     private fun keep(account: Account) {
+        val mine = attempt
         _state.update { it.copy(signIn = SignIn.CHECKING, problem = null) }
-        runCatching { DreamFolder(account, folder()).probe() }.exceptionOrNull()?.let { e ->
+        runCatching { DreamFolder(account, folder(), checkClient).probe() }.exceptionOrNull()?.let { e ->
+            // Cancelled by the reader meanwhile: nothing to report.
+            if (mine != attempt) return
             _state.update { it.copy(signIn = SignIn.IDLE, problem = if (e is Refused) Problem.REFUSED else Problem.UNREACHABLE) }
             return
         }
+        if (mine != attempt) return
         val sealed = Secrets.seal(account.password)
         if (sealed == null) {
             _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.NOT_KEPT) }

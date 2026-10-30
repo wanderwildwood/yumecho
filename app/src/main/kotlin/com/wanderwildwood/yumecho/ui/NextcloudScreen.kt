@@ -126,7 +126,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
                                 when (state.signIn) {
                                     SignIn.IDLE -> DreamSync.startSignIn()
                                     SignIn.WAITING -> DreamSync.cancelSignIn()
-                                    SignIn.CHECKING -> Unit
+                                    SignIn.CHECKING -> DreamSync.cancelSignIn()
                                 }
                             },
                         )
@@ -143,6 +143,9 @@ fun NextcloudScreen(onBack: () -> Unit) {
                                     Problem.NO_BROWSER -> R.string.nc_no_browser
                                     Problem.NOT_KEPT -> R.string.nc_not_kept
                                     Problem.TIMED_OUT -> R.string.nc_timed_out
+                                    Problem.BAD_LINK -> R.string.nc_bad_link
+                                    Problem.NEEDS_ADDRESS -> R.string.nc_needs_address
+                                    Problem.NEEDS_USER -> R.string.nc_needs_user
                                 },
                             ),
                         )
@@ -171,7 +174,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
             note = stringResource(R.string.nc_user_note),
             initial = user,
             secret = false,
-            onDone = { user = it.trim() },
+            onDone = { user = it.trim(); DreamSync.clearProblem() },
             onDismiss = { editing = null },
             words = true,
         )
