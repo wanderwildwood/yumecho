@@ -46,20 +46,24 @@ fun AboutDialog(onDismiss: () -> Unit) {
             return@EInkDialog
         }
         PagedColumn(modifier = Modifier.fillMaxWidth().height(room)) {
-            item(key = "title") {
-                TextMMD(
-                    text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
+            // The title travels with the first paragraph that follows it: a title row on its own
+            // made page 1 a line of text and a blank page.
             item(key = "privacy") {
-                Column(Modifier.padding(top = 14.dp)) {
-                    TextMMD(text = stringResource(R.string.about_privacy_title), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                    TextMMD(text = stringResource(R.string.about_privacy), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(bottom = 8.dp))
-                    TextMMD(text = stringResource(R.string.about_privacy_net), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(bottom = 8.dp))
-                    TextMMD(text = stringResource(R.string.about_privacy_rest), style = MaterialTheme.typography.labelSmall)
+                Column {
+                    TextMMD(
+                        text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    TextMMD(text = stringResource(R.string.about_privacy_title), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 14.dp))
+                    TextMMD(text = stringResource(R.string.about_privacy), style = MaterialTheme.typography.labelSmall)
                 }
+            }
+            item(key = "privacy_net") {
+                TextMMD(text = stringResource(R.string.about_privacy_net), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 8.dp))
+            }
+            item(key = "privacy_rest") {
+                TextMMD(text = stringResource(R.string.about_privacy_rest), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 8.dp))
             }
             item(key = "terms") { AboutPart(R.string.about_terms_title, R.string.about_terms) }
             item(key = "licences") {
