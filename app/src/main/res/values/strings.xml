@@ -85,19 +85,19 @@
     <!-- Top bar button, read aloud by a screen reader -->
     <string name="settings_cd_back">Back</string>
     <!-- A switch. "Notes" is the name of another app, the note-taking one -->
-    <string name="settings_notes">Keep dreams in Notes</string>
+    <string name="settings_notes">Keep dreams in Memo</string>
     <!-- Under the switch -->
     <string name="settings_notes_what">Each dream\'s words as a note in a Dreams folder. The recordings stay here.</string>
     <!-- Said when the switch is pressed and Notes is not on the phone, or is too old to take dreams -->
-    <string name="settings_notes_missing">Notes is not installed on this phone.</string>
+    <string name="settings_notes_missing">Memo is not installed on this phone.</string>
     <!-- Said when Notes is installed but its version has no way of taking dreams -->
-    <string name="settings_notes_too_old">Notes is installed, but this version cannot take dreams. Update Notes and try again.</string>
+    <string name="settings_notes_too_old">Memo is installed, but this version cannot take dreams. Update Memo and try again.</string>
     <!-- Said when Notes is on the phone but has not been given a place to keep notes -->
-    <string name="settings_notes_not_set_up">Notes has nowhere to keep notes yet. Open Notes and choose a place first.</string>
+    <string name="settings_notes_not_set_up">Memo has nowhere to keep notes yet. Open Memo and choose a place first.</string>
     <!-- Said when Notes will not take dreams from this copy of Dream Log -->
-    <string name="settings_notes_refused">Notes takes dreams only from the released Dream Log, and this one is not it.</string>
+    <string name="settings_notes_refused">Memo takes dreams only from the released Dream Log, and this one is not it.</string>
     <!-- Said when Notes could not be reached for any other reason -->
-    <string name="settings_notes_failed">Notes did not answer. Nothing has been changed.</string>
+    <string name="settings_notes_failed">Memo did not answer. Nothing has been changed.</string>
     <!-- Button that closes that message -->
     <string name="settings_close">Close</string>
 
@@ -120,7 +120,7 @@
     <string name="about_privacy_title">Privacy</string>
     <string name="about_privacy">Your dreams stay on this phone. The microphone is used only while you are recording, and recordings never leave the phone.</string>
     <string name="about_privacy_net">The app goes online only to fetch the speech model for a language other than English, a download that carries nothing you have recorded, and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in details are kept on this phone encrypted, and nothing is sent to the app\'s maker.</string>
-    <string name="about_privacy_rest">If you keep dreams in Notes, Notes has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
+    <string name="about_privacy_rest">If you keep dreams in Memo, Memo has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
     <string name="about_terms_title">Terms</string>
     <string name="about_terms">This app is free software under the GNU General Public License v3. It comes with no warranty: use it at your own risk. It is a journal tool, not medical or professional advice, and the words it makes can be wrong.</string>
     <!-- The name of the app's licence -->
@@ -195,22 +195,17 @@
     <string name="nc_show_key">Show the key</string>
     <string name="nc_hide_key">Hide the key</string>
 
-    <!-- The folio at the foot of a paged list, "2 / 6"; a tap on it asks for a page -->
-    <string name="folio_of">%1$d / %2$d</string>
-    <string name="folio_go_title">Go to page</string>
-    <string name="folio_page">Page %1$d of %2$d</string>
-    <string name="folio_go">Go</string>
-    <string name="folio_cancel">Cancel</string>
     <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_licence_head">Licence</string>
-    <string name="licences_licence">Dream Log is free software under the GNU General Public License, version 3 only (GPL-3.0-only), copyright wander wildwood, for what is written here. Speech recognition is whisper.cpp, compiled in under its own MIT licence (the notice also sits in the app\'s assets). The work it is built on keeps its own licence and its authors keep their copyright, as listed under Built with. The full text of each licence is at the end of this page.</string>
+    <string name="licences_licence">Dream Log is free software: GPL-3.0-only, copyright wander wildwood. Speech recognition is whisper.cpp, compiled in under its own MIT licence (the notice also sits in the app\'s assets). What it is built on keeps its own licences, listed below.</string>
     <string name="licences_built_head">Built with</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
-    <string name="licences_gpl">GNU General Public License, version 3</string>
-    <string name="licences_apache">Apache License, version 2.0</string>
-    <string name="licences_mit">MIT License</string>
-    <string name="licences_ofl">SIL Open Font License, version 1.1</string>
+    <string name="licences_full_head">Full texts</string>
+    <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
+    <string name="licences_full_apache">Apache License 2.0 (full text)</string>
+    <string name="licences_full_mit">MIT licence (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
 </resources>

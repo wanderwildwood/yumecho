@@ -86,8 +86,9 @@ fun LogScreen(
                 // By night, newest first, a whole page at a time.
                 val listState = rememberLazyListState()
                 PagedColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+                    modifier = Modifier.fillMaxSize(),
                     state = listState,
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp),
                 ) {
                     for ((date, list) in byNight(dreams)) {
                         item(key = "night-$date") {

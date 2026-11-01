@@ -2,7 +2,7 @@
 
 Dream Log records you in bed, turns what you say into words, and keeps both on the phone. It
 never sends any of it anywhere unless you ask. There are two exceptions, both yours to make.
-"Keep dreams in Notes" hands the words, not the recordings, to Notes on the same phone, which
+"Keep dreams in Memo" hands the words, not the recordings, to Memo on the same phone, which
 keeps and syncs them as it does your other notes. "Nextcloud", under Settings, sends the words,
 not the recordings, to your own Nextcloud server, and only after you sign in to it and turn
 sending on.
@@ -54,7 +54,7 @@ files/dreams/20260926-031204.txt   what the phone heard in it
 ```
 
 The file name is when the recording began. That is all of it, and, if the setting below is on, a list of which dreams have been
-handed to Notes and under what name: no account, no log of when the app was armed.
+handed to Memo and under what name: no account, no log of when the app was armed.
 
 Deleting a dream deletes both files. Uninstalling the app deletes all of them.
 
@@ -69,17 +69,17 @@ is outside the app, and deleting a dream or uninstalling the app does not delete
 writes it only when you press the row, and it needs no permission to do it, because you pick
 the place yourself.
 
-## Keeping dreams in Notes
+## Keeping dreams in Memo
 
-"Keep dreams in Notes", the one setting, is off until you turn it on. On, each dream's words,
-with its night, time and length, are handed to Notes, another app of mine on the same phone, as
-a note in its `Dreams` folder. The recordings are not. From there they are Notes' to keep: if
-Notes syncs to a Nextcloud or a folder, the words go there too, and deleting a dream in Dream
+"Keep dreams in Memo", the one setting, is off until you turn it on. On, each dream's words,
+with its night, time and length, are handed to Memo, another app of mine on the same phone, as
+a note in its `Dreams` folder. The recordings are not. From there they are Memo's to keep: if
+Memo syncs to a Nextcloud or a folder, the words go there too, and deleting a dream in Dream
 Log deletes its note. Turning the setting off leaves the notes already made where they are.
 
-Dream Log hands them over through Notes' own provider on the phone, not over a network, and
-Notes accepts them only from the released Dream Log. To see that it can, the manifest asks to
-see Notes (`<package android:name="com.wanderwildwood.oboegaki"/>` in `<queries>`) and the apps
+Dream Log hands them over through Memo's own provider on the phone, not over a network, and
+Memo accepts them only from the released Dream Log. To see that it can, the manifest asks to
+see Memo (`<package android:name="com.wanderwildwood.oboegaki"/>` in `<queries>`) and the apps
 that act on selected text, such as the Dictionary. Neither is a permission.
 
 ## Sending the words to your Nextcloud

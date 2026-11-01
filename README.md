@@ -37,12 +37,12 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
   one Markdown file, oldest night first, to copy to a computer. The recordings stay on the
   phone.
 
-- **Kept in Notes**, if you turn on "Keep dreams in Notes" behind the cog: each dream's words
-  also become a Markdown note in a `Dreams` folder of [Notes](https://github.com/wanderwildwood/oboegaki),
+- **Kept in Memo**, if you turn on "Keep dreams in Memo" behind the cog: each dream's words
+  also become a Markdown note in a `Dreams` folder of [Memo](https://github.com/wanderwildwood/oboegaki),
   named for when the recording began ("Dreams/2026-10-05 0712.md"), so they sync wherever
-  Notes syncs, turn up in its search, and open in any Markdown editor. A deleted dream's note is
-  deleted too. The recordings are not copied. Notes takes them only from the released Dream
-  Log, and Dream Log asks Notes before it turns the setting on.
+  Memo syncs, turn up in its search, and open in any Markdown editor. A deleted dream's note is
+  deleted too. The recordings are not copied. Memo takes them only from the released Dream
+  Log, and Dream Log asks Memo before it turns the setting on.
 - **Kept in your Nextcloud**, if you sign in under Settings > Nextcloud and turn on sending: the
   words of each dream (never the recordings) are saved as Markdown files in a folder of your own
   Nextcloud, over https. Sign-in is Nextcloud's own page (Login Flow v2); the app password it hands
@@ -65,8 +65,8 @@ and it works the same with the phone set to ring, vibrate or silent.
 `RECORD_AUDIO`, to record. The recognition runs on the phone, and nothing it hears leaves it.
 `INTERNET`, only to download the listening model for a language other than English, when one
 is chosen in the settings, and to send the words of dreams to your own Nextcloud, if you turn that on;
-with neither, the app never goes online. With "Keep dreams in Notes" on, the
-words are handed to Notes on the same phone, and Notes syncs them if it has been set up to. The details, and how to check them
+with neither, the app never goes online. With "Keep dreams in Memo" on, the
+words are handed to Memo on the same phone, and Memo syncs them if it has been set up to. The details, and how to check them
 rather than take them on trust, are in [PRIVACY.md](PRIVACY.md).
 
 ## Size
