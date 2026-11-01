@@ -151,7 +151,7 @@ private fun DreamLog() {
     val dream = dreams.firstOrNull { it.stamp == open }
     if (settingsOpen) {
         BackHandler { settingsOpen = false }
-        SettingsScreen(onBack = { settingsOpen = false })
+        SettingsScreen(onBack = { settingsOpen = false }, onAbout = { aboutOpen = true })
     } else if (dream != null) {
         BackHandler { open = null }
         DreamScreen(
@@ -184,7 +184,6 @@ private fun DreamLog() {
             onDisarm = { ArmService.disarm(context) },
             onOpen = { open = it.stamp },
             onSettings = { settingsOpen = true },
-            onAbout = { aboutOpen = true },
             exported = exported,
             onExport = { export.launch("dreams-${LocalDate.now()}.md") },
         )

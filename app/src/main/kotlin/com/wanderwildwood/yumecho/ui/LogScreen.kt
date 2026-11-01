@@ -50,7 +50,6 @@ fun LogScreen(
     onDisarm: () -> Unit,
     onOpen: (Dream) -> Unit,
     onSettings: () -> Unit,
-    onAbout: () -> Unit,
     exported: Boolean?,
     onExport: () -> Unit,
 ) {
@@ -61,7 +60,6 @@ fun LogScreen(
                 title = { TextMMD(text = stringResource(R.string.log_title)) },
                 actions = {
                     BarButton(Icons.Settings, stringResource(R.string.log_cd_settings), onSettings)
-                    BarButton(Icons.Info, stringResource(R.string.log_cd_about), onAbout)
                 },
             )
         },

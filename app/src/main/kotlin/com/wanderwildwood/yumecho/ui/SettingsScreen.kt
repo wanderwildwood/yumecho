@@ -44,7 +44,7 @@ import com.wanderwildwood.yumecho.notes.InNotes
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var nextcloudOpen by remember { mutableStateOf(false) }
     if (nextcloudOpen) {
         NextcloudScreen(onBack = { nextcloudOpen = false })
@@ -72,6 +72,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             TopAppBarMMD(
                 title = { TextMMD(text = stringResource(R.string.settings_title)) },
                 navigationIcon = { BarButton(Icons.Back, stringResource(R.string.settings_cd_back), onBack) },
+                actions = { BarButton(Icons.Info, stringResource(R.string.log_cd_about), onAbout) },
             )
         },
     ) { contentPadding ->
