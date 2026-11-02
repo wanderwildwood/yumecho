@@ -125,13 +125,10 @@
     <string name="about_terms">This app is free software under the GNU General Public License v3. It comes with no warranty: use it at your own risk. It is a journal tool, not medical or professional advice, and the words it makes can be wrong.</string>
     <!-- The name of the app's licence -->
     <string name="about_licence">GNU General Public License v3</string>
-    <string name="about_whisper">Speech recognition by whisper.cpp, MIT, with OpenAI\'s Whisper model, MIT</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
-    <string name="about_libraries">Mudita Mindful Design (MMD), Jetpack Compose and AndroidX, Kotlin and its libraries, all Apache License 2.0. OkHttp, Apache License 2.0. Lato typeface, SIL Open Font License 1.1.</string>
     <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
-    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_feed_the_llamas">Feed the llamas</string>
     <!-- Said when the phone has nothing that can open a web address -->
-    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <!-- Button that closes the About dialog -->
     <string name="about_close">Close</string>
     <!-- The language dreams are heard in -->
@@ -195,7 +192,6 @@
     <string name="nc_show_key">Show the key</string>
     <string name="nc_hide_key">Hide the key</string>
 
-    <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no licence text here.</string>
