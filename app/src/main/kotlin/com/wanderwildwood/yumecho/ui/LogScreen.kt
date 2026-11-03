@@ -73,7 +73,7 @@ fun LogScreen(
                 Spacer(Modifier.height(16.dp))
                 Arming(night, micAllowed, micRefused, onArm, onDisarm)
                 Spacer(Modifier.height(16.dp))
-                HorizontalDividerMMD()
+                DottedRule(start = 0.dp, end = 0.dp)
 
                 if (dreams.isEmpty()) {
                     Spacer(Modifier.height(16.dp))
@@ -97,8 +97,13 @@ fun LogScreen(
                                 modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
                             )
                         }
-                        for (dream in list) {
-                            item(key = dream.stamp) { DreamRow(dream, hearing, onOpen) }
+                        for ((i, dream) in list.withIndex()) {
+                            item(key = dream.stamp) {
+                                Column {
+                                    DreamRow(dream, hearing, onOpen)
+                                    if (i < list.lastIndex) DottedRule(start = 0.dp, end = 0.dp)
+                                }
+                            }
                         }
                     }
                     item(key = "export") { ExportRow(exported, onExport) }
@@ -161,7 +166,7 @@ private fun DreamRow(dream: Dream, hearing: String?, onOpen: (Dream) -> Unit) {
 private fun ExportRow(exported: Boolean?, onExport: () -> Unit) {
     Column {
         Spacer(Modifier.height(16.dp))
-        HorizontalDividerMMD()
+        DottedRule(start = 0.dp, end = 0.dp)
         TextMMD(
             text = stringResource(R.string.log_export),
             style = MaterialTheme.typography.bodyMedium,
