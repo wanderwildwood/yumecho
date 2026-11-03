@@ -70,7 +70,6 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var asking by remember { mutableStateOf(false) }
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current
-    remember { Speech.init(context) }
     var duraSpeedRisk by remember { mutableStateOf(DuraSpeed.atRisk(context)) }
     fun open(intent: android.content.Intent) = runCatching {
         context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
