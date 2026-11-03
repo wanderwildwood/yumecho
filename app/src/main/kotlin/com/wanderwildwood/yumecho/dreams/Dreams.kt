@@ -53,6 +53,26 @@ object Dreams {
         refresh()
     }
 
+    /** Writes the backup of every dream to [out]. */
+    fun backup(out: java.io.OutputStream) {
+        DreamBackup.write(out, all.value, { audio(it).inputStream() })
+    }
+
+    /**
+     * Adds the dreams of a backup that are not here yet; see [DreamBackup]. Throws
+     * [DreamBackup.BackupException] for a file that is not a good backup, having changed nothing.
+     */
+    fun restore(input: java.io.InputStream): DreamBackup.Added {
+        val scratch = File(dir.parentFile, "dreams-restore")
+        scratch.deleteRecursively()
+        val staged = DreamBackup.stage(input, scratch)
+        return try {
+            DreamBackup.commit(staged, dir, scratch)
+        } finally {
+            refresh()
+        }
+    }
+
     @Synchronized
     fun refresh() {
         // A listing that failed (null) is not an empty log: keep what was known, or a transient

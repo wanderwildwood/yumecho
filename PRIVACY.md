@@ -60,6 +60,8 @@ Deleting a dream deletes both files. Uninstalling the app deletes all of them.
 
 `android:allowBackup="false"` is set, so none of it goes to a cloud backup.
 
+**Save a backup** (Settings) writes every dream, its recording and its words, to one zip file you choose through the phone's own file picker, and only when you ask. **Restore from a backup** reads such a file the same way, checks all of it first, and only then adds the dreams that are not on the phone yet.
+
 ## Saving the words to a file
 
 "Save the words to a file", at the foot of the log, writes every dream's words into one text

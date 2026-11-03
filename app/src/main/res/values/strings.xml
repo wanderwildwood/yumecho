@@ -34,7 +34,7 @@
     <!-- At the foot of the log: writes every dream's words into one file (verb phrase) -->
     <string name="log_export">Save the words to a file</string>
     <!-- Under it, before it is pressed -->
-    <string name="log_export_what">Every dream in one text file, oldest first, to copy to a computer and write up. It holds what was heard and when, but not the recordings.</string>
+    <string name="log_export_what">Every dream in one text file, oldest first, to copy to a computer and write up. It holds what was heard and when, but not the recordings, and cannot be restored: use Save a backup in Settings for that.</string>
     <!-- Under it, once the file is written -->
     <string name="log_export_saved">Saved.</string>
     <!-- Under it, when the file could not be written -->
@@ -145,6 +145,20 @@
     <string name="speech_ask">Download the model for %1$s?</string>
     <!-- ============================================================ -->
     <!-- Settings > Nextcloud: keeping the words in the reader's own Nextcloud -->
+
+    <!-- Settings > Backup: every dream, with its recording, in one file the person keeps -->
+    <string name="backup_title">Save a backup</string>
+    <string name="backup_what">Every dream, its recording and its words, in one zip file you choose where to keep. Not saved: the language dreams are heard in, the Nextcloud sign-in, and the Memo switch.</string>
+    <string name="restore_title">Restore from a backup</string>
+    <string name="restore_what">Reads a zip made by Save a backup and adds the dreams that are not on this phone yet. Dreams already here are not changed or removed.</string>
+    <string name="backup_saved">Backup saved.</string>
+    <string name="backup_not_saved">The backup could not be written, so no file was kept.</string>
+    <!-- %1$d dreams added, %2$d already here -->
+    <string name="restore_done">Restored. %1$d dreams added, %2$d already here.</string>
+    <string name="restore_not_ours">That file is not a backup from this app. Nothing was changed.</string>
+    <string name="restore_newer">That backup was made by a newer version of this app. Update the app and try again. Nothing was changed.</string>
+    <string name="restore_damaged">That backup is damaged, so none of it was used. Nothing was changed.</string>
+    <string name="restore_unreadable">That file could not be read. Nothing was changed.</string>
 
     <string name="nc_title">Nextcloud</string>
     <string name="nc_row_off">Off. Your dreams stay on this phone.</string>

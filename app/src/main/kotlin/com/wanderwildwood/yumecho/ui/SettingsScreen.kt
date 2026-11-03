@@ -1,6 +1,18 @@
 package com.wanderwildwood.yumecho.ui
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import com.wanderwildwood.yumecho.dreams.DreamBackup
+import com.wanderwildwood.yumecho.dreams.Dreams
+import com.wanderwildwood.yumecho.hearing.Transcriber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +48,8 @@ import com.wanderwildwood.yumecho.hearing.Speech
 import com.wanderwildwood.yumecho.night.DuraSpeed
 import com.wanderwildwood.yumecho.notes.InNotes
 
+private val backupWork = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
 /**
  * Two settings: keeping dreams in Notes as well, and the language dreams are heard in.
  *
@@ -65,6 +79,46 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var choosingSpeech by remember { mutableStateOf(false) }
     val speech by Speech.state.collectAsState()
     val spoken by Speech.chosen.collectAsState()
+
+    // Both run on a scope that outlives the screen: a write cut off halfway, or a restore left
+    // half-staged, is worse than one that finishes after the person has gone back.
+    val saveBackup = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val app = context.applicationContext
+        backupWork.launch {
+            val ok = runCatching {
+                app.contentResolver.openOutputStream(uri, "wt")!!.use { Dreams.backup(it) }
+            }.isSuccess
+            // A failed write must not leave an empty or cut-off file that looks like a backup.
+            if (!ok) runCatching { android.provider.DocumentsContract.deleteDocument(app.contentResolver, uri) }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(app, app.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved), Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    val restoreBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val app = context.applicationContext
+        backupWork.launch {
+            val message = try {
+                val input = app.contentResolver.openInputStream(uri) ?: throw java.io.IOException("no stream")
+                val r = input.use { Dreams.restore(it) }
+                Transcriber.catchUp(app)
+                app.getString(R.string.restore_done, r.added, r.alreadyHere)
+            } catch (e: DreamBackup.BackupException) {
+                app.getString(
+                    when (e.kind) {
+                        DreamBackup.BackupException.Kind.NOT_A_BACKUP -> R.string.restore_not_ours
+                        DreamBackup.BackupException.Kind.NEWER -> R.string.restore_newer
+                        DreamBackup.BackupException.Kind.DAMAGED -> R.string.restore_damaged
+                    },
+                )
+            } catch (e: Exception) {
+                app.getString(R.string.restore_unreadable)
+            }
+            withContext(Dispatchers.Main) { Toast.makeText(app, message, Toast.LENGTH_LONG).show() }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -171,6 +225,32 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                         },
                         style = MaterialTheme.typography.labelSmall,
                     )
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable { runCatching { saveBackup.launch("dream-log-backup-${java.time.LocalDate.now()}.zip") } }
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                ) {
+                    TextMMD(text = stringResource(R.string.backup_title), style = MaterialTheme.typography.bodyLarge)
+                    TextMMD(text = stringResource(R.string.backup_what), style = MaterialTheme.typography.labelSmall)
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable { runCatching { restoreBackup.launch(arrayOf("application/zip", "application/octet-stream")) } }
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                ) {
+                    TextMMD(text = stringResource(R.string.restore_title), style = MaterialTheme.typography.bodyLarge)
+                    TextMMD(text = stringResource(R.string.restore_what), style = MaterialTheme.typography.labelSmall)
                 }
                 Spacer(Modifier.height(12.dp))
             }
