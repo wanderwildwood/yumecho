@@ -25,10 +25,27 @@ import java.util.concurrent.Executors
 
 enum class SignIn { IDLE, WAITING, CHECKING }
 
-enum class Problem { PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT, BAD_LINK, NEEDS_ADDRESS, NEEDS_USER }
+enum class Problem {
+    PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT, BAD_LINK, NEEDS_ADDRESS, NEEDS_USER,
+    BAD_ADDRESS, NOT_FOUND, CERTIFICATE, NOT_NEXTCLOUD, WRONG_PASSWORD, OTHER,
+    /** Not a problem: a Test that worked. */
+    TEST_GOOD,
+}
+
+/** What a failed typed check says, in the screen's own terms. */
+fun problemFor(p: CheckProblem): Problem = when (p) {
+    CheckProblem.BAD_ADDRESS -> Problem.BAD_ADDRESS
+    CheckProblem.PLAIN_HTTP -> Problem.PLAIN_HTTP
+    CheckProblem.NOT_FOUND -> Problem.NOT_FOUND
+    CheckProblem.UNREACHABLE -> Problem.UNREACHABLE
+    CheckProblem.CERTIFICATE -> Problem.CERTIFICATE
+    CheckProblem.NOT_NEXTCLOUD -> Problem.NOT_NEXTCLOUD
+    CheckProblem.WRONG_PASSWORD -> Problem.WRONG_PASSWORD
+    CheckProblem.OTHER -> Problem.OTHER
+}
 
 /**
- * Why signing in by hand cannot go ahead yet, or null when it can. Said on screen: a form that
+ * Why the typed sign-in cannot go ahead yet, or null when it can. Said on screen: a form that
  * closes without a word leaves the reader guessing.
  */
 fun handProblem(typed: String, user: String, appPassword: String): Problem? = when {
@@ -47,7 +64,6 @@ data class SyncState(
     val on: Boolean = false,
     val folder: String = DEFAULT_FOLDER,
     val typed: String = "",
-    val byHand: Boolean = false,
     val signIn: SignIn = SignIn.IDLE,
     val problem: Problem? = null,
     /** The last try to send did not get through; it is tried again at the next change. */
@@ -182,8 +198,6 @@ object DreamSync {
 
     fun clearProblem() = _state.update { it.copy(problem = null) }
 
-    fun byHand(on: Boolean) = _state.update { it.copy(byHand = on, problem = null) }
-
     /**
      * Nextcloud's own sign-in: its login page opens in the browser, and this asks the server every
      * two seconds whether the reader has finished there, for the twenty minutes it allows.
@@ -202,7 +216,7 @@ object DreamSync {
                 return@launch
             }
             if (!LoginFlow.acceptableLoginUrl(started.loginUrl, typed)) {
-                _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK, byHand = true) }
+                _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK) }
                 return@launch
             }
             val login = Intent(Intent.ACTION_VIEW, Uri.parse(started.loginUrl))
@@ -212,7 +226,7 @@ object DreamSync {
             val opened = isRealBrowser(handler?.activityInfo?.packageName) &&
                 runCatching { app.startActivity(login) }.isSuccess
             if (!opened) {
-                _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.NO_BROWSER, byHand = true) }
+                _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.NO_BROWSER) }
                 return@launch
             }
             repeat(600) {
@@ -241,15 +255,32 @@ object DreamSync {
         _state.update { it.copy(signIn = SignIn.IDLE) }
     }
 
-    /** For a phone with no browser: a login name and an app password made on the server by hand. */
-    fun signInByHand(user: String, appPassword: String) {
+    /**
+     * The typed sign-in, the first choice: the address already typed, a login name and an app
+     * password made on the server. The server is asked once; with [keepIt] false that is all (the
+     * Test button), otherwise a good answer goes on to be kept.
+     */
+    fun signInTyped(user: String, appPassword: String, keepIt: Boolean) {
         val typed = _state.value.typed
         val missing = handProblem(typed, user, appPassword)
         if (missing != null) {
             _state.update { it.copy(problem = missing) }
             return
         }
-        signingIn = scope.launch { keep(Account(LoginFlow.normalise(typed), user.trim(), appPassword.trim())) }
+        if (_state.value.signIn == SignIn.WAITING) cancelSignIn()
+        if (signingIn?.isActive == true) return
+        val mine = ++attempt
+        _state.update { it.copy(signIn = SignIn.CHECKING, problem = null) }
+        signingIn = scope.launch {
+            val result = NextcloudCheck.run(typed, user, appPassword, client = checkClient)
+            // Cancelled by the reader meanwhile: nothing to report.
+            if (mine != attempt) return@launch
+            when (result) {
+                is CheckResult.Good -> if (keepIt) keep(result.account) else
+                    _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.TEST_GOOD) }
+                is CheckResult.Bad -> _state.update { it.copy(signIn = SignIn.IDLE, problem = problemFor(result.problem)) }
+            }
+        }
     }
 
     private fun keep(account: Account) {
@@ -272,7 +303,7 @@ object DreamSync {
         prefs.edit().putString(SERVER, account.server).putString(USER, account.user)
             .putString(PASSWORD, sealed).putBoolean(ON, false).apply()
         _state.update {
-            it.copy(user = account.user, server = account.server, on = false, signIn = SignIn.IDLE, byHand = false, typed = "", behind = false)
+            it.copy(user = account.user, server = account.server, on = false, signIn = SignIn.IDLE, typed = "", behind = false)
         }
     }
 

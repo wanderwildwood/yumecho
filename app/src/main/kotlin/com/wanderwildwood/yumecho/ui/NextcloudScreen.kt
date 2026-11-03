@@ -52,7 +52,8 @@ private enum class Entry { ADDRESS, USER, PASSWORD, FOLDER }
 
 /**
  * Keeping dreams in the reader's own Nextcloud: what it does said first and plainly, then
- * signing in on Nextcloud's own page, the switch that actually sends, the folder, and signing
+ * signing in (typed address, login name and app password with a Test button, or Nextcloud's
+ * own page in the browser as the second choice), the switch that actually sends, the folder, and signing
  * out. Nothing is sent until the switch is on.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
     val state by DreamSync.state.collectAsState()
     var editing by remember { mutableStateOf<Entry?>(null) }
     var user by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -102,35 +104,13 @@ fun NextcloudScreen(onBack: () -> Unit) {
                 item { ArmedRow(stringResource(R.string.nc_sign_out), stringResource(R.string.nc_sign_out_armed), stringResource(R.string.nc_sign_out_note)) { DreamSync.signOut() } }
             } else {
                 item { Choice(stringResource(R.string.nc_address), state.typed.ifEmpty { stringResource(R.string.nc_not_set) }, { editing = Entry.ADDRESS }) }
-                if (state.byHand) {
-                    item { Choice(stringResource(R.string.nc_user), user.ifEmpty { stringResource(R.string.nc_not_set) }, { editing = Entry.USER }) }
-                    item { Choice(stringResource(R.string.nc_app_password), stringResource(R.string.nc_app_password_note), { editing = Entry.PASSWORD }) }
-                } else if (state.typed.isNotEmpty()) {
-                    item {
-                        Choice(
-                            stringResource(
-                                when (state.signIn) {
-                                    SignIn.IDLE -> R.string.nc_sign_in
-                                    SignIn.WAITING -> R.string.nc_waiting
-                                    SignIn.CHECKING -> R.string.nc_checking
-                                },
-                            ),
-                            stringResource(
-                                when (state.signIn) {
-                                    SignIn.IDLE -> R.string.nc_sign_in_note
-                                    SignIn.WAITING -> R.string.nc_waiting_note
-                                    SignIn.CHECKING -> R.string.nc_checking_note
-                                },
-                            ),
-                            {
-                                when (state.signIn) {
-                                    SignIn.IDLE -> DreamSync.startSignIn()
-                                    SignIn.WAITING -> DreamSync.cancelSignIn()
-                                    SignIn.CHECKING -> DreamSync.cancelSignIn()
-                                }
-                            },
-                        )
-                    }
+                item { Choice(stringResource(R.string.nc_user), user.ifEmpty { stringResource(R.string.nc_not_set) }, { editing = Entry.USER }) }
+                item {
+                    Choice(
+                        stringResource(R.string.nc_app_password),
+                        stringResource(if (password.isEmpty()) R.string.nc_not_set else R.string.nc_password_typed),
+                        { editing = Entry.PASSWORD },
+                    )
                 }
                 state.problem?.let { p ->
                     item {
@@ -146,14 +126,41 @@ fun NextcloudScreen(onBack: () -> Unit) {
                                     Problem.BAD_LINK -> R.string.nc_bad_link
                                     Problem.NEEDS_ADDRESS -> R.string.nc_needs_address
                                     Problem.NEEDS_USER -> R.string.nc_needs_user
+                                    Problem.BAD_ADDRESS -> R.string.nc_bad_address
+                                    Problem.NOT_FOUND -> R.string.nc_not_found
+                                    Problem.CERTIFICATE -> R.string.nc_certificate
+                                    Problem.NOT_NEXTCLOUD -> R.string.nc_not_nextcloud
+                                    Problem.WRONG_PASSWORD -> R.string.nc_wrong_password
+                                    Problem.OTHER -> R.string.nc_other
+                                    Problem.TEST_GOOD -> R.string.nc_test_good
                                 },
                             ),
                         )
                     }
                 }
-                if (!state.byHand) {
+                item {
+                    val checking = state.signIn == SignIn.CHECKING
+                    Choice(
+                        stringResource(if (checking) R.string.nc_checking else R.string.nc_sign_in),
+                        stringResource(if (checking) R.string.nc_checking_note else R.string.nc_sign_in_note),
+                        { if (checking) DreamSync.cancelSignIn() else DreamSync.signInTyped(user, password, keepIt = true) },
+                    )
+                }
+                item {
+                    Choice(
+                        stringResource(R.string.nc_test),
+                        stringResource(R.string.nc_test_note),
+                        { if (state.signIn != SignIn.CHECKING) DreamSync.signInTyped(user, password, keepIt = false) },
+                    )
+                }
+                if (state.typed.isNotEmpty() && state.signIn != SignIn.CHECKING) {
                     item {
-                        Choice(stringResource(R.string.nc_by_hand), stringResource(R.string.nc_by_hand_note), { DreamSync.cancelSignIn(); DreamSync.byHand(true) })
+                        val waiting = state.signIn == SignIn.WAITING
+                        Choice(
+                            stringResource(if (waiting) R.string.nc_waiting else R.string.nc_browser),
+                            stringResource(if (waiting) R.string.nc_waiting_note else R.string.nc_browser_note),
+                            { if (waiting) DreamSync.cancelSignIn() else DreamSync.startSignIn() },
+                        )
                     }
                 }
             }
@@ -183,7 +190,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
             note = stringResource(R.string.nc_app_password_how),
             initial = "",
             secret = true,
-            onDone = { DreamSync.signInByHand(user, it) },
+            onDone = { password = it.trim(); DreamSync.clearProblem() },
             onDismiss = { editing = null },
         )
         Entry.FOLDER -> EntryDialog(
