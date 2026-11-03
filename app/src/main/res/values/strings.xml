@@ -215,15 +215,15 @@
     <string name="nc_show_key">Show the key</string>
     <string name="nc_hide_key">Hide the key</string>
 
-    <string name="licences_title">Licences</string>
+    <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
-    <string name="licences_no_text">%s needs no licence text here.</string>
-    <string name="licences_licence">Dream Log is free software: GPL-3.0-only, copyright wander wildwood. Speech recognition is whisper.cpp, compiled in under its own MIT licence (the notice also sits in the app\'s assets). What it is built on keeps its own licences, each on its own page.</string>
+    <string name="licences_no_text">%s needs no license text here.</string>
+    <string name="licences_licence">Dream Log is free software: GPL-3.0-only, copyright wander wildwood. Speech recognition is whisper.cpp, compiled in under its own MIT license (the notice also sits in the app\'s assets). What it is built on keeps its own licenses, each on its own page.</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="licences_full_head">Full texts</string>
     <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
     <string name="licences_full_apache">Apache License 2.0 (full text)</string>
-    <string name="licences_full_mit">MIT licence (full text)</string>
-    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
+    <string name="licences_full_mit">MIT license (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font License 1.1 (full text)</string>
 </resources>

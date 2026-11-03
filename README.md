@@ -29,7 +29,7 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
   say your dream and fall back asleep, it stops by itself after twenty seconds of quiet.
 - **Afterwards**, while you sleep, the phone listens to the recording and writes down what it
   heard. A recording with nothing in it louder than the room is marked as nothing said rather
-  than handed to the recogniser, which, given silence, invents a polite "Thank you."
+  than handed to the recognizer, which, given silence, invents a polite "Thank you."
 - **In the morning** the log shows each night's dreams, and each one keeps its recording. The
   phone mishears, especially someone half asleep, and the recording is the real one.
 - It disarms itself after twelve hours.
@@ -110,11 +110,11 @@ For updates without doing this by hand, add this repository to
 
     https://github.com/wanderwildwood/yumecho
 
-## Licence
+## License
 
 GNU General Public License v3.0 only. Copyright wander wildwood.
 
-Bundled, under their own licences:
+Bundled, under their own licenses:
 
 - [whisper.cpp](https://github.com/ggml-org/whisper.cpp) v1.9.4, MIT, in
   `app/src/main/cpp/whisper.cpp`, trimmed to the parts an Android CPU build compiles
