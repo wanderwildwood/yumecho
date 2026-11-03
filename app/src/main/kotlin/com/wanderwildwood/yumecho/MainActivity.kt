@@ -1,6 +1,7 @@
 package com.wanderwildwood.yumecho
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.provider.Settings
@@ -26,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.exportText
+import com.wanderwildwood.yumecho.hearing.Speech
 import com.wanderwildwood.yumecho.hearing.Transcriber
 import com.wanderwildwood.yumecho.night.ArmService
 import com.wanderwildwood.yumecho.notes.InNotes
@@ -55,6 +57,7 @@ class MainActivity : ComponentActivity() {
         Dreams.init(this)
         InNotes.init(this)
         DreamSync.init(this)
+        Speech.init(this)
         setContent {
             // A steady cursor: nothing on an e-ink screen should blink.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
@@ -70,6 +73,8 @@ class MainActivity : ComponentActivity() {
      * on a Kompakt they move the ringer, which the system's own route to the app never sees.
      * Taken here, the key moves no volume and shows no slider.
      */
+    // A false positive: this overrides android.app.Activity.dispatchKeyEvent, a public API; androidx.core only re-declares it.
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             if (Night.state.value != Night.State.RESTING) {
