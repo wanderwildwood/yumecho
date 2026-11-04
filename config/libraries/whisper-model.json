@@ -1,0 +1,14 @@
+{
+  "uniqueId": "whisper-model",
+  "name": "Whisper speech model",
+  "description": "OpenAI's Whisper model in ggml form: the English base model is packed inside the app; the multilingual one is downloaded only if another language is chosen.",
+  "developers": [
+    {
+      "name": "OpenAI"
+    }
+  ],
+  "website": "https://github.com/openai/whisper",
+  "licenses": [
+    "openai-whisper-mit"
+  ]
+}

@@ -7,24 +7,12 @@ import com.wanderwildwood.yumecho.R
 /** The address of the app's own source code. */
 const val SOURCE_URL = "https://github.com/wanderwildwood/yumecho"
 
-/** What the APK carries that is not this app's own code, and the licence each project declares. */
-val LICENCE_COMPONENTS: List<LicenceComponent> = listOf(
-    LicenceComponent("whisper.cpp (speech recognition, compiled in)", "Georgi Gerganov and contributors", "MIT", "https://github.com/ggml-org/whisper.cpp"),
-    LicenceComponent("Whisper speech model (English model bundled, other languages downloaded)", "OpenAI", "MIT", "https://github.com/openai/whisper"),
-    LicenceComponent("OkHttp and Okio", "Square", "Apache-2.0", "https://square.github.io/okhttp/"),
-    LicenceComponent("Mudita Mindful Design (MMD)", "Mudita", "Apache-2.0", "https://github.com/mudita/MMD"),
-    LicenceComponent("Lato typeface, supplied with MMD", "\u0141ukasz Dziedzic", "OFL-1.1", "https://www.latofonts.com"),
-    LicenceComponent("AndroidX and Jetpack Compose", "Google", "Apache-2.0", "https://developer.android.com/jetpack"),
-    LicenceComponent("Kotlin and kotlinx.coroutines", "JetBrains", "Apache-2.0", "https://kotlinlang.org"),
-    LicenceComponent("Material Symbols icons", "Google", "Apache-2.0", "https://fonts.google.com/icons"),
-)
-
 /** Each distinct licence text once: family id and the raw resource. */
 val LICENCE_RAW: List<Pair<String, Int>> = listOf(
     "gpl" to R.raw.gpl_3_0,
     "apache" to R.raw.apache_2_0,
-    "mit" to R.raw.mit,
     "ofl" to R.raw.ofl_1_1,
+    "mpl" to R.raw.mpl_2_0,
 )
 
 @Composable
@@ -32,13 +20,14 @@ fun rememberLicencesData(): LicencesData = LicencesData(
     appName = "Dream Log",
     sourceUrl = SOURCE_URL,
     licenceLine = stringResource(R.string.licences_licence),
-    components = LICENCE_COMPONENTS,
+    // One row per artifact in the APK, listed by the build (config/libraries adds what Gradle cannot see).
+    components = rememberGeneratedComponents(R.raw.aboutlibraries),
     texts = LICENCE_RAW.map { (id, raw) ->
         LicenceText(id, stringResource(when (id) {
             "gpl" -> R.string.licences_full_gpl
             "apache" -> R.string.licences_full_apache
-            "mit" -> R.string.licences_full_mit
             "ofl" -> R.string.licences_full_ofl
+            "mpl" -> R.string.licences_full_mpl
             else -> R.string.licences_full_head
         }), raw)
     },
