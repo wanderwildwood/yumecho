@@ -39,6 +39,7 @@ import com.wanderwildwood.yumecho.ui.AboutDialog
 import com.wanderwildwood.yumecho.ui.DreamScreen
 import com.wanderwildwood.yumecho.ui.LogScreen
 import com.wanderwildwood.yumecho.ui.SettingsScreen
+import com.wanderwildwood.yumecho.ui.houseTypography
 import com.wanderwildwood.yumecho.ui.monochrome
 import com.wanderwildwood.yumecho.ui.nightHeadingInFile
 import com.wanderwildwood.yumecho.ui.timeAndLengthInFile
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // A steady cursor: nothing on an e-ink screen should blink.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-                ThemeMMD(colorScheme = monochrome) {
+                ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                     ArmedScope { DreamLog() }
                 }
             }
