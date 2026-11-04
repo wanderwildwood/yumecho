@@ -118,9 +118,10 @@ On a Kompakt, Settings can show a hint about DuraSpeed, the phone's background m
 whether the system has stopped the app since you said it was switched on, the app reads its own
 exit history from Android (`ActivityManager`). That stays on the phone and is never sent.
 
-## No third-party services
+## No analytics, ads or crash reporting
 
-No analytics, no advertising, no crash reporting. The dependencies are AndroidX, OkHttp (for the Nextcloud calls) and Jetpack
+No analytics, no advertising, no crash reporting. The only outside service is the Hugging Face
+model download above; Nextcloud is your own server. The dependencies are AndroidX, OkHttp (for the Nextcloud calls) and Jetpack
 Compose, Mudita's [MMD](https://github.com/mudita/MMD) design system, and whisper.cpp, which
 is compiled into the app from source in this repository.
 
@@ -134,6 +135,35 @@ You do not have to take any of it on trust:
   list `com.wanderwildwood.yumecho.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, which AndroidX
   adds to every app that listens for a system broadcast. It is the app's own, and no other app
   can hold it.
+
+<!-- shared-about privacy section -->
+## Who we are
+
+Dream Log is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. Dream Log keeps what you put in it on your phone, apart from what it sends to Hugging Face as described above, and sends nothing to the developer, so the developer holds no data about you.
+
+## How to contact us
+
+Write to email@wanderthe.dev about your data, this policy or anything else. The same address is in the app, under About.
+
+## Your rights
+
+If you are in the EU, the EEA or the UK, the GDPR gives you the right to:
+
+- see the personal data held about you (access)
+- have it corrected (rectification) or deleted (erasure)
+- limit how it is used (restriction)
+- object to its use (objection)
+- get a copy to take elsewhere (portability)
+- withdraw your consent at any time, where something rests on it
+- complain to a data protection supervisory authority, for example the one where you live
+
+Similar laws elsewhere, such as the CCPA in California, give you the right to know, delete and correct, and to opt out of the sale or sharing of your data. Nothing from Dream Log is sold or shared.
+
+Since Dream Log keeps what it stores only on your phone, you can exercise most of these rights yourself: delete a dream in the app (with Nextcloud sending on, its copy on your server goes too), save every dream to one file with Save a backup, clear the app's data in Android's settings, or uninstall the app, which deletes all of it. For anything you cannot do yourself, write to the address above.
+
+Dream Log connects to Hugging Face, only to download a speech model. Hugging Face is separate from this app and from its developer, and what it receives (an ordinary download request: your address on the internet and the time) is covered by its own privacy policy, <https://huggingface.co/privacy>; ask Hugging Face about what it holds.
+If you point Dream Log at a server of your own, what that server keeps is yours to manage.
+<!-- /shared-about privacy section -->
 
 ## Changes
 
