@@ -46,7 +46,6 @@ import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.cloud.DreamSync
 import com.wanderwildwood.yumecho.cloud.Problem
 import com.wanderwildwood.yumecho.cloud.SignIn
-import kotlinx.coroutines.delay
 
 private enum class Entry { ADDRESS, USER, PASSWORD, FOLDER }
 
@@ -232,16 +231,10 @@ private fun Choice(title: String, value: String, onClick: () -> Unit) {
     Spacer(Modifier.height(8.dp))
 }
 
-/** A row that asks for a second tap before it acts, and forgets the first after six seconds. */
+/** A row that asks for a second tap before it acts; it stays armed until the next other touch, Back or leaving. */
 @Composable
 private fun ArmedRow(title: String, armedTitle: String, note: String, onConfirm: () -> Unit) {
-    var armed by remember { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(6_000)
-            armed = false
-        }
-    }
+    var armed by rememberArmedFlag()
     Choice(if (armed) armedTitle else title, note) {
         if (armed) {
             armed = false

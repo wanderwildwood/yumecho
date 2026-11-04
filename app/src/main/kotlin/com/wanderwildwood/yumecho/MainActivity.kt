@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.wanderwildwood.yumecho.ui.ArmedScope
 
 /** File writes that must finish even if the screen they were started from is gone. */
 private val writes = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
             // A steady cursor: nothing on an e-ink screen should blink.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
                 ThemeMMD(colorScheme = monochrome) {
-                    DreamLog()
+                    ArmedScope { DreamLog() }
                 }
             }
         }

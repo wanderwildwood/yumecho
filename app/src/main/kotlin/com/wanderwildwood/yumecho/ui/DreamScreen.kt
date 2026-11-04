@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +33,6 @@ import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.paragraphs
-import kotlinx.coroutines.delay
 
 /**
  * One dream: what the phone heard, the recording itself, and a way to be rid of it.
@@ -139,18 +137,12 @@ private fun Playback(dream: Dream) {
 }
 
 /**
- * Asks in its own face, and forgets it asked after six seconds, so a stray tap does not leave
- * a live delete for whoever picks the phone up next.
+ * Asks in its own face. It stays armed, with no timer, until the next tap or drag elsewhere,
+ * Back, or leaving the screen, so a stray tap does not leave a live delete behind.
  */
 @Composable
 private fun DeleteRow(onDelete: () -> Unit) {
-    var armed by remember { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(6000)
-            armed = false
-        }
-    }
+    var armed by rememberArmedFlag()
     TextMMD(
         text = stringResource(if (armed) R.string.dream_delete_confirm else R.string.dream_delete),
         style = MaterialTheme.typography.bodyMedium,
