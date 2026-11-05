@@ -185,7 +185,7 @@ dependencies {
 
 // The Licenses page lists what the build actually packs: this plugin walks each variant's runtime
 // dependencies and writes res/raw/aboutlibraries.json (one entry per artifact, with its POM's
-// licence). What Gradle cannot see (fonts, data sets, native code, desugaring) and licence texts
+// license). What Gradle cannot see (fonts, data sets, native code, desugaring) and license texts
 // of our own choosing are in config/libraries and config/licenses. Offline: the build fetches
 // nothing; the full texts come from res/raw and config/licenses. The app reads the file with
 // shared-licences' LicencesJson.kt (no AboutLibraries runtime library).
@@ -233,8 +233,21 @@ tasks.matching { it.name.startsWith("prepareLibraryDefinitions") }.configureEach
         val bad = mutableListOf<String>()
         outputs.files.asFileTree.matching { include("**/aboutlibraries.json") }.forEach { f ->
             @Suppress("UNCHECKED_CAST")
-            val root = groovy.json.JsonSlurper().parse(f) as Map<String, Any?>
+            val root = groovy.json.JsonSlurper().parse(f) as MutableMap<String, Any?>
             val lics = (root["licenses"] as? Map<String, Map<String, Any?>>).orEmpty()
+            // A library's own license file (config/licenses, with its copyright line) stands in for
+            // the bare family entry its POM names: the plugin merges config entries in, it never
+            // takes one out, so a library would otherwise list "MIT" twice, once with no text.
+            var changed = false
+            (root["libraries"] as? List<MutableMap<String, Any?>>).orEmpty().forEach { lib ->
+                val keys = (lib["licenses"] as? List<String>).orEmpty()
+                fun fam(k: String) = family((lics[k]?.get("spdxId") ?: lics[k]?.get("name") ?: k).toString())
+                fun hasText(k: String) = !(lics[k]?.get("content") as? String).isNullOrBlank()
+                val own = keys.filter { hasText(it) }.mapNotNull { fam(it) }.toSet()
+                val kept = keys.filterNot { !hasText(it) && fam(it) in own }
+                if (kept != keys) { lib["licenses"] = kept; changed = true }
+            }
+            if (changed) f.writeText(groovy.json.JsonOutput.toJson(root))
             (root["libraries"] as? List<Map<String, Any?>>).orEmpty().forEach { lib ->
                 val keys = (lib["licenses"] as? List<String>).orEmpty()
                 if (keys.isEmpty()) bad += "${lib["uniqueId"]}: no license"

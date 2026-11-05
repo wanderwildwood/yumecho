@@ -139,7 +139,7 @@ You do not have to take any of it on trust:
 <!-- shared-about privacy section -->
 ## Who we are
 
-Dream Log is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. Dream Log keeps what you put in it on your phone, apart from what it sends to Hugging Face as described above, and sends nothing to the developer, so the developer holds no data about you.
+Dream Log is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. What you put in Dream Log stays on your phone. The only things that go out are the requests described above: the download of a speech model from Hugging Face, which carries nothing of yours, and, only if you turn on Nextcloud sending, the words of your dreams sent to your own Nextcloud server. Nothing is sent to the developer, so the developer holds no data about you.
 
 ## How to contact us
 
