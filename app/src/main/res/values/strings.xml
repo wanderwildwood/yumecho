@@ -117,6 +117,7 @@
 
     <!-- Heading. %1$s is the version number, e.g. 0.1.0 -->
     <string name="about_title">Dream Log %1$s</string>
+    <string name="about_what">Arm it before you sleep. If a dream wakes you, press a volume key in the dark and say it; by morning it is written down, transcribed on the phone itself.</string>
     <string name="about_privacy_title">Privacy</string>
     <string name="about_privacy">Your dreams stay on this phone. The microphone is used only while you are recording, and recordings never leave the phone.</string>
     <string name="about_privacy_net">The app goes online only to fetch the speech model for a language other than English, a download that carries nothing you have recorded, and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in details are kept on this phone encrypted, and nothing is sent to the app\'s maker.</string>
@@ -218,7 +219,7 @@
     <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no license text here.</string>
-    <string name="licences_licence">Dream Log is free software: GPL-3.0-only, copyright wander wildwood. Speech recognition is whisper.cpp, compiled in under its own MIT license (the notice also sits in the app\'s assets). What it is built on keeps its own licenses, each on its own page.</string>
+    <string name="licences_licence">Dream Log is free software: GPL-3.0-only, copyright wander wildwood. Speech recognition is whisper.cpp, compiled in under its own MIT license (the notice also sits in the app\'s assets). What it is built on keeps its own licenses, listed below.</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="licences_full_head">Full texts</string>
@@ -229,6 +230,12 @@
     <!-- shared-about: contact row + privacy section (edit in /opt/projects/shared-about) -->
     <string name="about_write_to">Write to %1$s</string>
     <string name="about_no_mail_app">No email app is installed. The address is %1$s.</string>
+    <!-- shared-about: what a screen reader says for an About drawer, the heading passed in -->
+    <string name="about_open_drawer">Open %1$s</string>
+    <string name="about_close_drawer">Close %1$s</string>
+    <string name="about_intro_head">What it does</string>
+    <string name="about_contact_head">Contact</string>
+    <string name="about_links_head">Links</string>
     <string name="privacy_who_title">Who we are</string>
     <string name="privacy_who">This app is made by wander wildwood, an independent developer: one person, not a company. That makes wander wildwood the data controller for anything the app itself handles, and that is very little: what you put in stays on this phone. The only things that go out are the requests described above: a speech model download from Hugging Face, which carries nothing you have recorded, and, only if you turn on Nextcloud sending, the words of your dreams sent to your own Nextcloud. Nothing comes to the developer.</string>
     <string name="privacy_contact_title">How to contact us</string>
