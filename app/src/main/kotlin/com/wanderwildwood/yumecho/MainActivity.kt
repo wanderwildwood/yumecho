@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import com.wanderwildwood.yumecho.night.Night
 import com.wanderwildwood.yumecho.ui.AboutDialog
 import com.wanderwildwood.yumecho.ui.DreamScreen
+import com.wanderwildwood.yumecho.ui.FilesCreateDocument
 import com.wanderwildwood.yumecho.ui.LogScreen
 import com.wanderwildwood.yumecho.ui.SettingsScreen
 import com.wanderwildwood.yumecho.ui.houseTypography
@@ -112,7 +113,7 @@ private fun DreamLog() {
 
     // Null until the file has been saved once, then whether it was written.
     var exported by remember { mutableStateOf<Boolean?>(null) }
-    val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/markdown")) { uri: Uri? ->
+    val export = rememberLauncherForActivityResult(FilesCreateDocument("text/markdown")) { uri: Uri? ->
         if (uri != null) {
             val text = exportText(
                 dreams = Dreams.list.value,

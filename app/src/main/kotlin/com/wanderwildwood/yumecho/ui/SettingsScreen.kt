@@ -3,7 +3,6 @@ package com.wanderwildwood.yumecho.ui
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import com.wanderwildwood.yumecho.dreams.DreamBackup
 import com.wanderwildwood.yumecho.dreams.Dreams
@@ -81,7 +80,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
 
     // Both run on a scope that outlives the screen: a write cut off halfway, or a restore left
     // half-staged, is worse than one that finishes after the person has gone back.
-    val saveBackup = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
+    val saveBackup = rememberLauncherForActivityResult(FilesCreateDocument("application/zip")) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         val app = context.applicationContext
         backupWork.launch {
@@ -95,7 +94,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             }
         }
     }
-    val restoreBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+    val restoreBackup = rememberLauncherForActivityResult(FilesOpenDocument(writable = false)) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         val app = context.applicationContext
         backupWork.launch {

@@ -40,6 +40,8 @@
         <!-- Notes, for "Keep dreams in Notes": its provider is invisible to this app without
              this. Notes does its own syncing. -->
         <package android:name="com.wanderwildwood.oboegaki" />
+        <!-- Files (Cabinet), which answers "save a file" and "open a file" with its own screens. -->
+        <package android:name="com.wanderwildwood.tana" />
     </queries>
 
     <application
