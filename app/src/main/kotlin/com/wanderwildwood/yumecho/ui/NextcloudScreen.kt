@@ -73,7 +73,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
             )
         },
     ) { contentPadding ->
-        PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+        PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding), showCutRow = true) {
             item { Note(stringResource(R.string.nc_explain)) }
             item { Note(stringResource(R.string.nc_private)) }
             if (state.user != null) {

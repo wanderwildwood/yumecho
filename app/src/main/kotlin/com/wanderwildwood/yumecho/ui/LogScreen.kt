@@ -87,6 +87,7 @@ fun LogScreen(
                     modifier = Modifier.fillMaxSize(),
                     state = listState,
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp),
+                    showCutRow = true,
                 ) {
                     for ((date, list) in byNight(dreams)) {
                         item(key = "night-$date") {

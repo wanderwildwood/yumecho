@@ -58,6 +58,7 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 20.dp),
+            showCutRow = true,
         ) {
             item {
                 TextMMD(
