@@ -183,6 +183,23 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                 Spacer(Modifier.height(12.dp))
             }
             item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { DarkMode.set(context, !DarkMode.on) }
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextMMD(text = stringResource(R.string.settings_dark), style = MaterialTheme.typography.bodyLarge)
+                        TextMMD(text = stringResource(R.string.settings_dark_note), style = MaterialTheme.typography.labelSmall)
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    SwitchMMD(checked = DarkMode.on, onCheckedChange = null)
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
