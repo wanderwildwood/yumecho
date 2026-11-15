@@ -42,6 +42,7 @@ import com.wanderwildwood.yumecho.ui.LogScreen
 import com.wanderwildwood.yumecho.ui.SettingsScreen
 import com.wanderwildwood.yumecho.ui.houseTypography
 import com.wanderwildwood.yumecho.ui.monochrome
+import com.wanderwildwood.yumecho.ui.DarkSelection
 import com.wanderwildwood.yumecho.ui.nightHeadingInFile
 import com.wanderwildwood.yumecho.ui.timeAndLengthInFile
 import kotlinx.coroutines.CoroutineScope
@@ -64,9 +65,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             // A steady cursor: nothing on an e-ink screen should blink.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-                ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+                ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                     ArmedScope { DreamLog() }
-                }
+                } }
             }
         }
     }
