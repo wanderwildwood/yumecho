@@ -1,7 +1,6 @@
 package com.wanderwildwood.yumecho.ui
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import com.wanderwildwood.yumecho.dreams.DreamBackup
@@ -32,6 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -79,6 +84,9 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
         context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
     }
     var stopping by remember { mutableStateOf(false) }
+    // What the last backup or restore did, in words, under their rows. It stays until the next
+    // press on this screen: a Toast's few seconds can pass unread on this panel.
+    var notice by remember { mutableStateOf<String?>(null) }
     var choosingSpeech by remember { mutableStateOf(false) }
     val speech by Speech.state.collectAsState()
     val spoken by Speech.chosen.collectAsState()
@@ -95,7 +103,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             // A failed write must not leave an empty or cut-off file that looks like a backup.
             if (!ok) runCatching { android.provider.DocumentsContract.deleteDocument(app.contentResolver, uri) }
             withContext(Dispatchers.Main) {
-                Toast.makeText(app, app.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved), Toast.LENGTH_LONG).show()
+                notice = app.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved)
             }
         }
     }
@@ -119,7 +127,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             } catch (e: Exception) {
                 app.getString(R.string.restore_unreadable)
             }
-            withContext(Dispatchers.Main) { Toast.makeText(app, message, Toast.LENGTH_LONG).show() }
+            withContext(Dispatchers.Main) { notice = message }
         }
     }
 
@@ -133,7 +141,17 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             )
         },
     ) { contentPadding ->
-        PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+        PagedColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                        notice = null
+                    }
+                },
+        ) {
             // On a Kompakt, DuraSpeed shuts the app down in the dark, which is where an armed
             // night is spent. Its list cannot be read, so the hint hides only on the person's
             // word that Dream Log is on it, and comes back if the system stops the app.
@@ -274,6 +292,18 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     TextMMD(text = stringResource(R.string.restore_what), style = MaterialTheme.typography.labelSmall)
                 }
                 Spacer(Modifier.height(12.dp))
+            }
+            notice?.let { words ->
+                item(key = "notice") {
+                    TextMMD(
+                        text = words,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                    )
+                }
             }
         }
     }
