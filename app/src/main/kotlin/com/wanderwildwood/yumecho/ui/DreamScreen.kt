@@ -2,6 +2,7 @@ package com.wanderwildwood.yumecho.ui
 
 import android.media.MediaPlayer
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -106,33 +107,53 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
 @Composable
 private fun Playback(dream: Dream) {
     var playing by remember { mutableStateOf(false) }
+    // A recording that cannot be read or played says so under the button, and stays said.
+    var failed by remember(dream.stamp) { mutableStateOf(false) }
     val player = remember(dream.stamp) { MediaPlayer() }
     DisposableEffect(player) {
-        runCatching {
+        failed = runCatching {
             player.setDataSource(Dreams.audio(dream).path)
             player.prepare()
-        }
+        }.isFailure
         player.setOnCompletionListener { playing = false }
+        player.setOnErrorListener { _, _, _ ->
+            playing = false
+            failed = true
+            true
+        }
         onDispose { player.release() }
     }
-    OutlinedButtonMMD(
-        onClick = {
-            runCatching {
-                if (playing) player.pause() else player.start()
-                playing = !playing
+    Column {
+        OutlinedButtonMMD(
+            onClick = {
+                if (failed) return@OutlinedButtonMMD
+                runCatching {
+                    if (playing) player.pause() else player.start()
+                    playing = !playing
+                }.onFailure {
+                    playing = false
+                    failed = true
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = if (playing) Icons.Pause else Icons.Play,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                TextMMD(text = stringResource(if (playing) R.string.dream_pause else R.string.dream_play))
             }
-        },
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = if (playing) Icons.Pause else Icons.Play,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(22.dp),
+        }
+        if (failed) {
+            TextMMD(
+                text = stringResource(R.string.dream_cannot_play),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp),
             )
-            Spacer(Modifier.width(8.dp))
-            TextMMD(text = stringResource(if (playing) R.string.dream_pause else R.string.dream_play))
         }
     }
 }

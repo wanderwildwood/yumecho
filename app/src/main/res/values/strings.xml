@@ -71,6 +71,7 @@
     <!-- Play and pause the recording (verbs) -->
     <string name="dream_play">Play</string>
     <string name="dream_pause">Pause</string>
+    <string name="dream_cannot_play">This recording cannot be played.</string>
     <string name="dream_delete">Delete this dream</string>
     <!-- The same row after one tap: a second tap deletes -->
     <string name="dream_delete_confirm">Delete — tap again</string>
