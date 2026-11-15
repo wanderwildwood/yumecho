@@ -55,8 +55,8 @@ android {
         // The Kompakt runs Android 12 (API 31); nothing here needs anything newer.
         minSdk = 31
         targetSdk = 31
-        versionCode = 34
-        versionName = "0.1.33"
+        versionCode = 35
+        versionName = "0.1.34"
 
         ndk {
             // The Kompakt is arm64. The emulator an x86_64 debug build is tried on is added
