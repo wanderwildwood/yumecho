@@ -46,6 +46,11 @@ import com.wanderwildwood.yumecho.cloud.DreamSync
 import com.wanderwildwood.yumecho.hearing.Speech
 import com.wanderwildwood.yumecho.night.DuraSpeed
 import com.wanderwildwood.yumecho.notes.InNotes
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
 
 private val backupWork = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -178,7 +183,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                         TextMMD(text = stringResource(R.string.settings_notes_what), style = MaterialTheme.typography.labelSmall)
                     }
                     Spacer(Modifier.width(16.dp))
-                    SwitchMMD(checked = on, onCheckedChange = null)
+                    SwitchMMD(checked = on, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(on) })
                 }
                 Spacer(Modifier.height(12.dp))
             }
@@ -186,6 +191,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .semantics { role = Role.Switch; toggleableState = ToggleableState(DarkMode.on) }
                         .clickable { DarkMode.set(context, !DarkMode.on) }
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,

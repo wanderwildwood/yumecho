@@ -48,6 +48,11 @@ import com.wanderwildwood.yumecho.cloud.Problem
 import com.wanderwildwood.yumecho.cloud.SignIn
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
 
 private enum class Entry { ADDRESS, USER, PASSWORD, FOLDER }
 
@@ -87,6 +92,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 48.dp)
+                            .semantics { role = Role.Switch; toggleableState = ToggleableState(state.on) }
                             .clickable { DreamSync.setOn(!state.on) }
                             .padding(horizontal = 20.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
