@@ -46,6 +46,8 @@ import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.cloud.DreamSync
 import com.wanderwildwood.yumecho.cloud.Problem
 import com.wanderwildwood.yumecho.cloud.SignIn
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 private enum class Entry { ADDRESS, USER, PASSWORD, FOLDER }
 
@@ -262,13 +264,21 @@ private fun EntryDialog(
     var value by remember { mutableStateOf(TextFieldValue(initial, TextRange(initial.length))) }
     var shown by remember { mutableStateOf(false) }
     val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focus.requestFocus() }
     val filled = value.text.isNotBlank() && value.text.trim() != "https://"
     val save = {
         if (filled) onDone(value.text)
         onDismiss()
     }
     EInkDialog(onDismiss = onDismiss) {
+        // The field is what the dialog is for: it takes the focus as it opens and the keyboard
+        // comes up. Asked from inside the dialog, a frame after it is drawn: the field lives in
+        // the dialog's own window, which a request from the screen beneath does not reach.
+        val keyboardNow = LocalSoftwareKeyboardController.current
+        LaunchedEffect(Unit) {
+            withFrameNanos { }
+            runCatching { focus.requestFocus() }
+            keyboardNow?.show()
+        }
         TextMMD(text = title, style = MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.height(6.dp))
         TextMMD(text = note, style = MaterialTheme.typography.labelSmall)
