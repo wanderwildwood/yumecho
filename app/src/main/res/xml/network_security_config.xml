@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    No cleartext anywhere. The app reaches two places only, both over https: Hugging Face, for the
+    multilingual listening model (hearing/Speech.kt, checked against a SHA-256 before it is used),
+    and, only if switched on, the reader's own Nextcloud (cloud/). An http:// Nextcloud address is
+    refused before anything is sent; this makes the system refuse it too.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>
