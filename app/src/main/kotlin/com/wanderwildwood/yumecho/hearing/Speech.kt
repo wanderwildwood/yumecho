@@ -142,9 +142,11 @@ object Speech {
                             if (cancelled) error("cancelled")
                             val n = input.read(buffer)
                             if (n < 0) break
+                            got += n
+                            // Longer than the known file is not the file: stop before it fills the phone.
+                            if (got > MODEL_BYTES) error("too long")
                             output.write(buffer, 0, n)
                             digest.update(buffer, 0, n)
-                            got += n
                             val percent = (got * 100 / total).toInt().coerceIn(0, 99)
                             val now = _state.value
                             if (now !is State.Downloading || now.percent != percent) {
