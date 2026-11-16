@@ -180,7 +180,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
     // The platform stubs org.json out of local unit tests; the sign-in reply is JSON.
-    testImplementation("org.json:json:20231013")
+    testImplementation("org.json:json:20260814")
 }
 
 // The Licenses page lists what the build actually packs: this plugin walks each variant's runtime
