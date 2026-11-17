@@ -2,9 +2,11 @@ package com.wanderwildwood.yumecho.notes
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import com.wanderwildwood.yumecho.BuildConfig
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.noteText
@@ -18,6 +20,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.security.MessageDigest
 import java.util.concurrent.Executors
 
 /**
@@ -26,7 +29,10 @@ import java.util.concurrent.Executors
  *
  * Notes takes them through a small provider of its own, which answers only to the released
  * Dream Log. Dream Log itself never sends a dream over the network; Notes does that part, if
- * it has been set up to.
+ * it has been set up to. The other way round, nothing is sent until the app answering for
+ * Notes' provider is shown to be Notes: its package name and the certificate its releases are
+ * signed with. Android gives a provider's name to whichever app claims it first, so a name alone
+ * proves nothing.
  *
  * It follows the log rather than being told about each change: whenever the list of dreams
  * changes, every dream with words that has no note yet gets one, and every note whose dream has
@@ -36,7 +42,9 @@ import java.util.concurrent.Executors
  */
 object InNotes {
     private const val TAG = "InNotes"
-    private val PROVIDER: Uri = Uri.parse("content://com.wanderwildwood.oboegaki.capture")
+    private const val AUTHORITY = "com.wanderwildwood.oboegaki.capture"
+    private val PROVIDER: Uri = Uri.parse("content://$AUTHORITY")
+    private const val NOTES = NotesIdentity.NOTES
     private const val ON = "on"
     private const val PATH = "path:"
 
@@ -115,13 +123,35 @@ object InNotes {
 
     /** Tells an absent Notes from one too old to have the provider. */
     private fun missing(): Answer = try {
-        app.packageManager.getPackageInfo("com.wanderwildwood.oboegaki", 0)
+        app.packageManager.getPackageInfo(NOTES, 0)
         Answer.TOO_OLD
     } catch (e: Exception) {
         Answer.NOT_INSTALLED
     }
 
+    /** The app now answering for Notes' provider, checked; null when it is Notes. */
+    private fun notNotes(): Answer? {
+        val pm = app.packageManager
+        val owner = try {
+            pm.resolveContentProvider(AUTHORITY, 0)?.packageName
+        } catch (e: Exception) {
+            null
+        } ?: return missing()
+        val certs = try {
+            pm.getPackageInfo(owner, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
+                ?.apkContentsSigners.orEmpty()
+                .map { s -> MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString("") { "%02x".format(it) } }
+        } catch (e: Exception) {
+            emptyList()
+        }
+        if (NotesIdentity.isNotes(owner, certs, BuildConfig.DEBUG)) return null
+        Log.w(TAG, "the provider for Notes belongs to another app; nothing sent")
+        return Answer.REFUSED
+    }
+
     private fun call(method: String, arg: String?, extras: Bundle? = null): Answer {
+        // Checked before every call, not once at turning on: Notes may have gone since.
+        notNotes()?.let { return it }
         val reply = try {
             app.contentResolver.call(PROVIDER, method, arg, extras)
         } catch (e: IllegalArgumentException) {
