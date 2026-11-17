@@ -16,10 +16,9 @@ Not a fork. Written from scratch in Kotlin and Jetpack Compose, using Mudita's o
 | ![The log](screenshots/1-log.png) | ![Armed for the night](screenshots/2-armed.png) |
 | ![One dream](screenshots/3-dream.png) | ![What it does with what it hears](screenshots/4-about.png) |
 
-## Where this is up to
+## How long the words take
 
-Version 0.1.23. Every screen has been driven on an emulator, and the speech recognition has
-been timed on a Kompakt: a minute of speech takes about half a minute to write down.
+On a Kompakt, a minute of speech takes about half a minute to write down.
 
 ## How it works
 
@@ -50,7 +49,9 @@ been timed on a Kompakt: a minute of speech takes about half a minute to write d
 - **The words can be looked up.** A dream's words are selectable, and the menu over them has
   Define, from the Dictionary, behind its ⋮.
 
-Settings holds those two switches, the Nextcloud sign-in, and the language dreams are heard in.
+Settings holds those two switches, the Nextcloud sign-in, the language dreams are heard in,
+Dark mode, and **Save a backup** and **Restore from a backup**: every recording and its words in
+one file, put where you choose and brought back on this phone or a new one.
 
 ### Why a volume key
 
@@ -91,13 +92,7 @@ without one, `assembleRelease` produces an unsigned APK that will not install an
 
 ## Contributing
 
-Issues and pull requests are welcome. The things that would help most:
-
-- **Reports from real nights.** Whether the key was heard with the screen off, whether the screen
-  stayed dark, whether the words were anything like what you said.
-- **Other devices.** It should run on any Android 12 or later phone, but it has only been seen
-  on one.
-- **Other languages.** How well it hears yours, if it isn't English.
+Issues and pull requests are welcome.
 
 ## Getting it, and keeping it
 
