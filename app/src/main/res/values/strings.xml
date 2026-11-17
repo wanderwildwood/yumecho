@@ -138,7 +138,7 @@
     <!-- Under the row while the other languages' model downloads: "Deutsch: downloading, 40%" -->
     <string name="speech_downloading">%1$s: downloading, %2$d%%</string>
     <string name="speech_failed">%1$s: the download did not finish. Tap to try again.</string>
-    <string name="speech_note">English is built in. Any other language needs a second listening model, about 60 MB, downloaded once from Hugging Face over the internet. That download is all the app ever fetches; nothing you record leaves the phone. Choosing English again deletes it.</string>
+    <string name="speech_note">English is built in. Any other language needs a second listening model, about 60 MB, downloaded once from Hugging Face over the internet. The download carries nothing you have recorded. Choosing English again deletes it.</string>
     <string name="speech_current">%1$s (current)</string>
     <string name="speech_stop_ask">Stop the download? The language stays as it is.</string>
     <string name="speech_stop">Stop download</string>
@@ -167,7 +167,7 @@
     <string name="nc_row_signed_in">Signed in, not sending</string>
     <string name="nc_row_on">Sending the words of your dreams</string>
     <string name="nc_explain">Dream Log can keep a copy of the words of your dreams in your own Nextcloud, so they survive losing this phone. It is off, and nothing leaves the phone, until you sign in here and turn on sending. Only the words go, as plain text files, never the recordings. They go over an encrypted https connection to the folder you choose.</string>
-    <string name="nc_private">Your Nextcloud password is never typed here: you type an app password made for this phone alone (or sign in on Nextcloud\'s own page, which gives this phone one). It is kept on the phone encrypted with a key held in its secure hardware, and you can take it back in Nextcloud\'s security settings at any time. The files in Nextcloud are ordinary text, so anyone who can open that account can read them. With sending on, deleting a dream here deletes its copy there. Turning sending off leaves the copies already there. Nothing goes to the app\'s maker.</string>
+    <string name="nc_private">Your Nextcloud password is never typed here: you type an app password made for this phone alone (or sign in on Nextcloud\'s own page, which gives this phone one). It is kept on the phone sealed with a key in the phone\'s keystore that cannot be copied out, and you can take it back in Nextcloud\'s security settings at any time. The files in Nextcloud are ordinary text, so anyone who can open that account can read them. With sending on, deleting a dream here deletes its copy there. Turning sending off leaves the copies already there. Nothing goes to the app\'s maker.</string>
     <string name="nc_account">Account</string>
     <string name="nc_signed_in">%1$s on %2$s</string>
     <string name="nc_send">Send dreams to Nextcloud</string>

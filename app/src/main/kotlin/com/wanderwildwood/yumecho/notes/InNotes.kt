@@ -28,8 +28,8 @@ import java.util.concurrent.Executors
  * Dreams folder, so they sync wherever Notes syncs and turn up in its search.
  *
  * Notes takes them through a small provider of its own, which answers only to the released
- * Dream Log. Dream Log itself never sends a dream over the network; Notes does that part, if
- * it has been set up to. The other way round, nothing is sent until the app answering for
+ * Dream Log. This path sends nothing over the network itself (Nextcloud sending, in cloud/, is
+ * separate); Notes does that part, if it has been set up to. The other way round, nothing is sent until the app answering for
  * Notes' provider is shown to be Notes: its package name and the certificate its releases are
  * signed with. Android gives a provider's name to whichever app claims it first, so a name alone
  * proves nothing.

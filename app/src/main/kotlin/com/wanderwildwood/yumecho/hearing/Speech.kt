@@ -17,7 +17,8 @@ import java.util.concurrent.Executors
  * APK: choosing one downloads it once, into the app's own storage, and it is used only if it
  * is byte for byte the file this app was tested with. Choosing English again deletes it.
  *
- * This download is the only thing the app ever fetches, and nothing goes the other way.
+ * The download carries nothing of the user's. (Sending dreams to Nextcloud, when it is on,
+ * is cloud/ and nothing to do with this.)
  */
 object Speech {
 
