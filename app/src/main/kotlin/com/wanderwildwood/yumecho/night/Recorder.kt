@@ -27,14 +27,19 @@ class Recorder(private val onFinished: (File, Stop) -> Unit) {
         const val LONGEST = 5 * 60
     }
 
-    @Volatile private var running = false
+    /** One recording's own stop word, so a recording finishing can never stop the next one. */
+    private class Capture { @Volatile var running = true }
+
+    /** The recording under way, until its file is finished; null when there is none. */
+    @Volatile private var capture: Capture? = null
     private var thread: Thread? = null
 
-    val isRecording get() = running
+    val isRecording get() = capture != null
 
     /** False if the microphone could not be opened. */
     @SuppressLint("MissingPermission")
     fun start(): Boolean {
+        if (capture != null) return false
         val rate = Wav.RATE
         val minBuffer = AudioRecord.getMinBufferSize(rate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         val record = AudioRecord(
@@ -46,34 +51,36 @@ class Recorder(private val onFinished: (File, Stop) -> Unit) {
             return false
         }
         val part = Dreams.newRecording(LocalDateTime.now())
-        running = true
-        thread = Thread({ capture(record, part) }, "recorder").apply { start() }
+        val mine = Capture()
+        capture = mine
+        thread = Thread({ capture(mine, record, part) }, "recorder").apply { start() }
         return true
     }
 
     fun stop() {
-        running = false
+        capture?.running = false
         thread?.join(3000)
-        thread = null
+        if (thread?.isAlive != true) thread = null
     }
 
-    private fun capture(record: AudioRecord, part: File) {
+    private fun capture(c: Capture, record: AudioRecord, part: File) {
         val rate = Wav.RATE
         val second = ShortArray(rate)
         val bytes = ByteArray(rate * 2)
         var quiet = 0
         var seconds = 0
         var why = Stop.PRESSED
-        val out = RandomAccessFile(part, "rw")
+        var out: RandomAccessFile? = null
         try {
-            out.setLength(0)
-            out.write(ByteArray(Wav.HEADER))
+            val file = RandomAccessFile(part, "rw").also { out = it }
+            file.setLength(0)
+            file.write(ByteArray(Wav.HEADER))
             record.startRecording()
-            while (running) {
+            while (c.running) {
                 var filled = 0
-                while (filled < rate && running) {
+                while (filled < rate && c.running) {
                     val n = record.read(second, filled, rate - filled)
-                    if (n < 0) { why = Stop.FAILED; running = false; break }
+                    if (n < 0) { why = Stop.FAILED; c.running = false; break }
                     filled += n
                 }
                 var sum = 0.0
@@ -83,23 +90,33 @@ class Recorder(private val onFinished: (File, Stop) -> Unit) {
                     bytes[i * 2] = (s and 0xff).toByte()
                     bytes[i * 2 + 1] = (s shr 8 and 0xff).toByte()
                 }
-                out.write(bytes, 0, filled * 2)
+                file.write(bytes, 0, filled * 2)
                 seconds++
                 val rms = if (filled > 0) sqrt(sum / filled) else 0.0
                 quiet = if (rms < Listening.QUIET_RMS) quiet + 1 else 0
-                if (quiet >= QUIET_STOP) { why = Stop.QUIET; running = false }
-                if (seconds >= LONGEST) { why = Stop.LONGEST; running = false }
+                if (quiet >= QUIET_STOP) { why = Stop.QUIET; c.running = false }
+                if (seconds >= LONGEST) { why = Stop.LONGEST; c.running = false }
             }
+        } catch (e: Exception) {
+            // Storage full or failing, or the microphone refusing to start: this recording ends
+            // (what was written is kept), and the night stays armed for the next press.
+            why = Stop.FAILED
         } finally {
             // Released in a finally, or a failed read leaves the microphone held and the
             // next press finds it busy.
             runCatching { record.stop() }
             record.release()
-            out.seek(0)
-            out.write(Wav.header(out.length() - Wav.HEADER))
-            out.close()
-            running = false
-            onFinished(Dreams.finish(part), why)
+            runCatching {
+                out?.let {
+                    it.seek(0)
+                    it.write(Wav.header(it.length() - Wav.HEADER))
+                }
+            }
+            runCatching { out?.close() }
+            c.running = false
+            val done = Dreams.finish(part)
+            capture = null
+            onFinished(done, why)
         }
     }
 }

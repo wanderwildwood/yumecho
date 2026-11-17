@@ -82,6 +82,7 @@ class ArmService : Service() {
     private var lastPress = 0L
 
     private val expire = Runnable { stopSelf() }
+    private var armedAt = 0L
 
     /**
      * The volume the keys move while armed: a pretend one, held in the middle so a press is
@@ -203,6 +204,7 @@ class ArmService : Service() {
         armed = true
 
         holdTheKeys()
+        armedAt = SystemClock.elapsedRealtime()
         main.postDelayed(expire, LONGEST_NIGHT)
         Night.current.value = Night.State.ARMED
         // Not sticky: if Android kills it, it stays off rather than coming back without the
@@ -212,6 +214,12 @@ class ArmService : Service() {
 
     private fun pressed() {
         val now = SystemClock.elapsedRealtime()
+        // The delayed disarm counts only time awake, and a sleeping phone can take days to
+        // reach it: a press after the longest night, by the clock that counts sleep, disarms.
+        if (now - armedAt > LONGEST_NIGHT && !recorder.isRecording) {
+            stopSelf()
+            return
+        }
         if (now - lastPress < DEBOUNCE) return
         lastPress = now
         if (recorder.isRecording) {
