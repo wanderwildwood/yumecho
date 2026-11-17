@@ -33,8 +33,9 @@ object Transcriber {
             val lock = app.getSystemService(PowerManager::class.java)
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yumecho:transcribing")
             // Held so the phone does not doze halfway through a dream. Never a screen lock:
-            // nothing here may light the screen at night.
-            lock.acquire(30 * 60 * 1000L)
+            // nothing here may light the screen at night. Taken afresh for each dream, for as
+            // long as that one could take, so a long queue is not cut off by one fixed timeout.
+            lock.setReferenceCounted(false)
             try {
                 // Re-read each time, because one may have been deleted meanwhile. Each is tried
                 // once per run: one Whisper cannot hear stays waiting, and must not be retried
@@ -43,6 +44,7 @@ object Transcriber {
                 while (true) {
                     val next = Dreams.waiting().firstOrNull { it.stamp !in tried } ?: break
                     tried += next.stamp
+                    lock.acquire(maxOf(10 * 60 * 1000L, next.seconds * 3 * 1000L))
                     hear(app, next)
                 }
             } finally {
@@ -56,7 +58,17 @@ object Transcriber {
         current.value = dream.stamp
         val file = Dreams.audio(dream)
         if (!file.exists()) return
-        val samples = runCatching { Wav.samples(file.readBytes()) }.getOrNull()
+        // A file that could not be read this time (storage, memory) stays waiting; only one that
+        // was read and is not this app's sound format is taken as nothing said.
+        val bytes =
+            try {
+                file.readBytes()
+            } catch (e: Exception) {
+                return
+            } catch (e: OutOfMemoryError) {
+                return
+            }
+        val samples = runCatching { Wav.samples(bytes) }.getOrNull()
         val text = when {
             samples == null -> ""
             !Listening.anythingSaid(samples) -> ""

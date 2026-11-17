@@ -24,7 +24,32 @@ object Dreams {
     fun init(context: Context) {
         if (::dir.isInitialized) return
         dir = File(context.filesDir, "dreams").apply { mkdirs() }
+        tidyAfterAStop()
         refresh()
+    }
+
+    /**
+     * What a process stopped mid-way left behind, looked at once as the app starts, when nothing
+     * can still be writing: a recording cut off is given its header and kept (or let go if it
+     * holds under a second); words with no recording, or half-written, are let go.
+     */
+    private fun tidyAfterAStop() {
+        val files = dir.listFiles() ?: return
+        for (f in files) {
+            runCatching {
+                when {
+                    f.name.endsWith(".wav.part") ->
+                        if (f.length() < Wav.HEADER + Wav.RATE * 2) {
+                            f.delete()
+                        } else {
+                            java.io.RandomAccessFile(f, "rw").use { it.write(Wav.header(f.length() - Wav.HEADER)) }
+                            f.renameTo(File(dir, f.name.removeSuffix(".part")))
+                        }
+                    f.name.endsWith(".txt.part") -> f.delete()
+                    f.name.endsWith(".txt") && !File(dir, f.name.removeSuffix(".txt") + ".wav").exists() -> f.delete()
+                }
+            }
+        }
     }
 
     /** Where the next recording goes while it is being made. */
@@ -42,11 +67,20 @@ object Dreams {
 
     fun waiting(): List<Dream> = all.value.filter { it.text == null }
 
+    /**
+     * Keeps what was heard in [dream], unless it was deleted while it was being heard. Written
+     * aside and moved into place, so a stop half-way never leaves it heard as nothing.
+     */
+    @Synchronized
     fun heard(dream: Dream, text: String) {
-        File(dir, "${dream.stamp}.txt").writeText(text)
+        if (!audio(dream).exists()) return
+        val part = File(dir, "${dream.stamp}.txt.part")
+        part.writeText(text)
+        if (!part.renameTo(File(dir, "${dream.stamp}.txt"))) part.delete()
         refresh()
     }
 
+    @Synchronized
     fun delete(dream: Dream) {
         File(dir, "${dream.stamp}.wav").delete()
         File(dir, "${dream.stamp}.txt").delete()
