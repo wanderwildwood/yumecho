@@ -73,16 +73,31 @@ the place yourself.
 
 ## Keeping dreams in Memo
 
-"Keep dreams in Memo", the one setting, is off until you turn it on. On, each dream's words,
+"Keep dreams in Memo" is off until you turn it on. On, each dream's words,
 with its night, time and length, are handed to Memo, another app of mine on the same phone, as
 a note in its `Dreams` folder. The recordings are not. From there they are Memo's to keep: if
 Memo syncs to a Nextcloud or a folder, the words go there too, and deleting a dream in Dream
 Log deletes its note. Turning the setting off leaves the notes already made where they are.
 
 Dream Log hands them over through Memo's own provider on the phone, not over a network, and
-Memo accepts them only from the released Dream Log. To see that it can, the manifest asks to
-see Memo (`<package android:name="com.wanderwildwood.oboegaki"/>` in `<queries>`) and the apps
-that act on selected text, such as the Dictionary. Neither is a permission.
+Memo accepts them only from the released Dream Log; Dream Log, for its part, sends nothing until
+the app answering is Memo itself, known by its package name and signing certificate.
+
+## What the app can see of other apps
+
+None of these is a permission. The manifest's `<queries>` lets the app see, on the phone:
+
+- **Memo** (`com.wanderwildwood.oboegaki`), for "Keep dreams in Memo" above.
+- **Home** (`com.wanderwildwood.iori`), whose dark mode switch the app follows when Home is
+  installed: it reads that one on/off answer from Home's provider, and nothing else.
+- **Files (Cabinet)** (`com.wanderwildwood.tana`), which, when installed, answers "save a file"
+  and "open a file" for backup, restore and export with its own screens.
+- **Browsers**, so a web address (the About's links) opens in a real browser.
+- **DuraSpeed** (`com.mediatek.duraspeed`), the Kompakt's background manager, only to know
+  whether it is there; the app also reads DuraSpeed's own on/off switch from the phone's system
+  settings, to word the hint in Settings. Neither is sent anywhere.
+- **Apps that act on selected text**, such as the Dictionary, so the menu over a dream's words
+  can offer them.
 
 ## Sending the words to your Nextcloud
 
@@ -117,6 +132,12 @@ Signing in alone sends nothing.
 On a Kompakt, Settings can show a hint about DuraSpeed, the phone's background manager. To tell
 whether the system has stopped the app since you said it was switched on, the app reads its own
 exit history from Android (`ActivityManager`). That stays on the phone and is never sent.
+
+## Links in About
+
+"Feed the llamas" in About opens a donation page (square.link) in your browser, only when you
+press it. The app sends nothing there and learns nothing about whether you went; if you give,
+the payment is handled on that page by Square.
 
 ## No analytics, ads or crash reporting
 
