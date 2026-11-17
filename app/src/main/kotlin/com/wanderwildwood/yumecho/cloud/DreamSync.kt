@@ -215,7 +215,11 @@ object DreamSync {
                 _state.update { it.copy(signIn = SignIn.IDLE, problem = if (e is Refused) Problem.REFUSED else Problem.UNREACHABLE) }
                 return@launch
             }
-            if (!LoginFlow.acceptableLoginUrl(started.loginUrl, typed)) {
+            // The login page and the address polled for the answer are both on the server typed,
+            // over https; so is the server the answer names, checked below.
+            if (!LoginFlow.acceptableLoginUrl(started.loginUrl, typed) ||
+                !LoginFlow.acceptableLoginUrl(started.pollUrl, typed)
+            ) {
                 _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK) }
                 return@launch
             }
@@ -239,6 +243,10 @@ object DreamSync {
                     null
                 }
                 if (got != null) {
+                    if (!LoginFlow.acceptableLoginUrl(got.server, typed)) {
+                        _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK) }
+                        return@launch
+                    }
                     keep(got)
                     return@launch
                 }
