@@ -15,7 +15,7 @@
     <!-- The button that starts listening for the night (verb) -->
     <string name="log_arm">Arm for the night</string>
     <!-- Under the arm button, before arming -->
-    <string name="log_how">Then, if you wake from a dream, press a volume key and say it. One buzz means it is listening. Press again, or stop talking, and two buzzes mean it has stopped.</string>
+    <string name="log_how">Then, if you wake from a dream, press a volume key and say it. One buzz means it is listening. Press again, or stop talking, and two buzzes mean it has stopped. One long buzz means nothing was recorded.</string>
     <!-- While armed -->
     <string name="log_armed">Armed. Press a volume key to record.</string>
     <string name="log_recording">Recording.</string>

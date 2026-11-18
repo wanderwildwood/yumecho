@@ -42,7 +42,8 @@ import com.wanderwildwood.yumecho.hearing.Transcriber
  * ringer, notification and media volumes are never touched. (Earlier versions listened for a
  * volume changing; on a phone set to vibrate the keys move nothing, so nothing was heard.)
  *
- * One buzz means it is recording; two mean it has stopped. That is the whole of the feedback,
+ * One buzz means it is recording; two mean it has stopped; one long one means a press left
+ * nothing recorded ([Buzz]). That is the whole of the feedback,
  * on purpose: nothing here turns the screen on, lights it, or unlocks the phone, and the only
  * wake lock held is the partial one that keeps the processor awake while it records.
  *
@@ -188,11 +189,11 @@ class ArmService : Service() {
         com.wanderwildwood.yumecho.cloud.DreamSync.init(this)
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "yumecho:recording")
-        recorder = Recorder { _, _ ->
+        recorder = Recorder { done, _ ->
             main.post {
                 if (wakeLock.isHeld) wakeLock.release()
                 if (armed) Night.current.value = Night.State.ARMED
-                buzz(twice = true)
+                buzz(Buzz.afterRecording(done))
                 Transcriber.catchUp(this)
             }
         }
@@ -236,17 +237,17 @@ class ArmService : Service() {
             wakeLock.acquire(Recorder.LONGEST * 1000L + 10_000)
             if (recorder.start()) {
                 Night.current.value = Night.State.RECORDING
-                buzz(twice = false)
+                buzz(Buzz.RECORDING)
             } else {
                 wakeLock.release()
+                buzz(Buzz.NOTHING)
             }
         }
     }
 
-    private fun buzz(twice: Boolean) {
+    private fun buzz(what: Buzz) {
         val vibrator = getSystemService(VibratorManager::class.java).defaultVibrator
-        val pattern = if (twice) longArrayOf(0, 120, 150, 120) else longArrayOf(0, 200)
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
+        vibrator.vibrate(VibrationEffect.createWaveform(what.pattern, -1))
     }
 
     override fun onDestroy() {

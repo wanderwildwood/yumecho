@@ -25,7 +25,8 @@ On a Kompakt, a minute of speech takes about half a minute to write down.
 - **Armed**, it waits with the screen off and the phone locked. Nothing lights the screen and
   nothing unlocks it.
 - **A volume key** starts a recording: one buzz. Press again and it stops: two buzzes. If you
-  say your dream and fall back asleep, it stops by itself after twenty seconds of quiet.
+  say your dream and fall back asleep, it stops by itself after twenty seconds of quiet. One
+  long buzz means nothing was recorded: the microphone would not start, or failed at once.
 - **Afterwards**, while you sleep, the phone listens to the recording and writes down what it
   heard. A recording with nothing in it louder than the room is marked as nothing said rather
   than handed to the recognizer, which, given silence, invents a polite "Thank you."
