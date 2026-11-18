@@ -114,7 +114,9 @@ class Recorder(private val onFinished: (File, Stop) -> Unit) {
             }
             runCatching { out?.close() }
             c.running = false
-            val done = Dreams.finish(part)
+            // Never thrown out of here: this thread ending in an error would end the app, and
+            // the night armed with it.
+            val done = runCatching { Dreams.finish(part) }.getOrDefault(part)
             capture = null
             onFinished(done, why)
         }

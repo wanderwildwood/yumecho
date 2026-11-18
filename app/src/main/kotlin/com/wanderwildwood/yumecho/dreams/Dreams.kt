@@ -75,7 +75,12 @@ object Dreams {
     fun heard(dream: Dream, text: String) {
         if (!audio(dream).exists()) return
         val part = File(dir, "${dream.stamp}.txt.part")
-        part.writeText(text)
+        try {
+            part.writeText(text)
+        } catch (e: Exception) {
+            part.delete()
+            throw e
+        }
         if (!part.renameTo(File(dir, "${dream.stamp}.txt"))) part.delete()
         refresh()
     }
@@ -111,13 +116,18 @@ object Dreams {
     fun refresh() {
         // A listing that failed (null) is not an empty log: keep what was known, or a transient
         // storage error would read as "every dream is gone" and delete the Nextcloud copies.
+        // The same for a file that could not be read: the whole listing keeps what was known.
         val files = dir.listFiles { f -> f.name.endsWith(".wav") } ?: return
-        all.value = files.mapNotNull { wav ->
-            val stamp = wav.name.removeSuffix(".wav")
-            val time = runCatching { LocalDateTime.parse(stamp, Dream.STAMP) }.getOrNull()
-                ?: return@mapNotNull null
-            val txt = File(dir, "$stamp.txt")
-            Dream(stamp, time, Wav.seconds(wav.length()), if (txt.exists()) txt.readText() else null)
-        }.sortedBy { it.time }
+        all.value = try {
+            files.mapNotNull { wav ->
+                val stamp = wav.name.removeSuffix(".wav")
+                val time = runCatching { LocalDateTime.parse(stamp, Dream.STAMP) }.getOrNull()
+                    ?: return@mapNotNull null
+                val txt = File(dir, "$stamp.txt")
+                Dream(stamp, time, Wav.seconds(wav.length()), if (txt.exists()) txt.readText() else null)
+            }.sortedBy { it.time }
+        } catch (e: Exception) {
+            return
+        }
     }
 }

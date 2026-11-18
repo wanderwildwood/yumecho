@@ -1,6 +1,7 @@
 package com.wanderwildwood.yumecho.hearing
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.PowerManager
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
@@ -19,6 +20,8 @@ import java.util.concurrent.Executors
  */
 object Transcriber {
     private const val THREADS = 3
+    private const val TRIES = "transcriber-tries"
+    private const val MOST_TRIES = 3
 
     private val worker = Executors.newSingleThreadExecutor { Thread(it, "transcriber") }
     private val current = MutableStateFlow<String?>(null)
@@ -41,17 +44,44 @@ object Transcriber {
                 // once per run: one Whisper cannot hear stays waiting, and must not be retried
                 // in a loop until morning.
                 val tried = mutableSetOf<String>()
+                val tries = app.getSharedPreferences(TRIES, Context.MODE_PRIVATE)
+                forgetTheGone(tries)
                 while (true) {
-                    val next = Dreams.waiting().firstOrNull { it.stamp !in tried } ?: break
+                    val next = Dreams.waiting()
+                        .firstOrNull { it.stamp !in tried && tries.getInt(it.stamp, 0) < MOST_TRIES }
+                        ?: break
                     tried += next.stamp
                     lock.acquire(maxOf(10 * 60 * 1000L, next.seconds * 3 * 1000L))
-                    hear(app, next)
+                    // Counted before it is heard and let go after, written at once: a recording
+                    // that takes the whole app down while it is heard is counted, and after
+                    // [MOST_TRIES] of those it is left waiting rather than stopping the app on
+                    // every start.
+                    tries.edit().putInt(next.stamp, tries.getInt(next.stamp, 0) + 1).commit()
+                    try {
+                        hear(app, next)
+                    } catch (e: Exception) {
+                        // Storage full or failing: this one stays waiting for the next run.
+                    } catch (e: Error) {
+                        if (e is VirtualMachineError) throw e
+                    }
+                    tries.edit().remove(next.stamp).commit()
                 }
+            } catch (e: Exception) {
+                // Nothing that goes wrong here may stop the app, or the night armed with it.
             } finally {
                 current.value = null
                 if (lock.isHeld) lock.release()
             }
         }
+    }
+
+    /** Tries that never came to an end are kept only for recordings still in the log. */
+    private fun forgetTheGone(tries: SharedPreferences) {
+        val here = Dreams.list.value.map { it.stamp }.toSet()
+        // An empty log may be one that could not be listed: nothing is forgotten on that.
+        if (here.isEmpty()) return
+        val gone = tries.all.keys.filter { it !in here }
+        if (gone.isNotEmpty()) tries.edit().apply { gone.forEach(::remove) }.commit()
     }
 
     private fun hear(context: Context, dream: Dream) {
