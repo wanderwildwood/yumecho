@@ -95,7 +95,7 @@ class SyncTest {
     @Test
     fun `a dream with words is planned under its time, one without words waits`() {
         val steps = plan(listOf(dream("20261005-071204", "I flew."), dream("20261005-080000", null), dream("20261005-081500", "  ")), emptyMap(), ::render)
-        assertEquals(listOf<Step>(Step.Put("20261005-071204", "2026-10-05 0712.md", "# night\n\nI flew.\n")), steps)
+        assertEquals(listOf<Step>(Step.Put("20261005-071204", "2026-10-05 0712.md", "# night\n\nI flew.\n", wordsPrint(dream("20261005-071204", "I flew.")))), steps)
     }
 
     @Test
@@ -108,13 +108,39 @@ class SyncTest {
     fun `a sent dream is left alone, changed words are sent again under the same name, a gone dream is removed`() {
         val d = dream("20261005-071204", "I flew.")
         val sent = mapOf(
-            d.stamp to Sent("2026-10-05 0712.md", fingerprint(render(d))),
+            d.stamp to Sent("2026-10-05 0712.md", wordsPrint(d)),
             "20261001-010101" to Sent("2026-10-01 0101.md", "x"),
         )
         assertEquals(listOf<Step>(Step.Remove("20261001-010101", "2026-10-01 0101.md")), plan(listOf(d), sent, ::render))
         val changed = d.copy(text = "I flew far.")
         val steps = plan(listOf(changed), mapOf(d.stamp to sent.getValue(d.stamp)), ::render)
-        assertEquals(listOf<Step>(Step.Put(d.stamp, "2026-10-05 0712.md", render(changed))), steps)
+        assertEquals(listOf<Step>(Step.Put(d.stamp, "2026-10-05 0712.md", render(changed), wordsPrint(changed))), steps)
+    }
+
+    @Test
+    fun `a new language or clock setting sends nothing`() {
+        val d = dream("20261005-071204", "I flew.")
+        val sent = mapOf(d.stamp to Sent("2026-10-05 0712.md", wordsPrint(d)))
+        assertEquals(emptyList<Step>(), plan(listOf(d), sent) { "# la nuit\n\n${it.text}\n" })
+    }
+
+    @Test
+    fun `a copy under the old whole-file fingerprint is adopted, not sent again`() {
+        val d = dream("20261005-071204", "I flew.")
+        val old = mapOf(d.stamp to Sent("2026-10-05 0712.md", fingerprint(render(d))))
+        assertEquals(listOf<Step>(Step.Adopt(d.stamp, "2026-10-05 0712.md", wordsPrint(d))), plan(listOf(d), old, ::render))
+        // Its words changed as well: sent, as before.
+        val changed = d.copy(text = "I flew far.")
+        assertEquals(listOf<Step>(Step.Put(d.stamp, "2026-10-05 0712.md", render(changed), wordsPrint(changed))), plan(listOf(changed), old, ::render))
+    }
+
+    @Test
+    fun `an adopted copy is recorded without a request`() {
+        val d = dream("20261005-071204", "I flew.")
+        val sent = mutableMapOf(d.stamp to Sent("2026-10-05 0712.md", fingerprint(render(d))))
+        run("Dream Log", listOf(d), sent)
+        assertEquals(wordsPrint(d), sent.getValue(d.stamp).hash)
+        assertTrue(dav.log.isEmpty())
     }
 
     // Against the in-memory server ----------------------------------------------------------------
