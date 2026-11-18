@@ -23,7 +23,7 @@
     <string name="log_disarm">Disarm</string>
 
     <!-- Before the microphone permission is granted -->
-    <string name="log_mic_why">Dream Log needs the microphone to record what you say. The recordings stay on this phone and are never sent anywhere.</string>
+    <string name="log_mic_why">Dream Log needs the microphone to record what you say. The app never sends a recording anywhere; one leaves the phone only in a backup you save yourself.</string>
     <!-- Button that asks for the microphone permission (verb) -->
     <string name="log_allow">Allow</string>
     <string name="log_open_settings">Open app settings</string>
@@ -122,7 +122,7 @@
     <string name="about_title">Dream Log %1$s</string>
     <string name="about_what">Arm it before you sleep. If a dream wakes you, press a volume key in the dark and say it; by morning it is written down, transcribed on the phone itself.</string>
     <string name="about_privacy_title">Privacy</string>
-    <string name="about_privacy">Your dreams stay on this phone. The microphone is used only while you are recording, and recordings never leave the phone. \"Feed the llamas\" in About opens a donation page (square.link) in your browser, only when you press it. The app sends nothing there; if you give, the payment is handled on that page by Square, not by this app.</string>
+    <string name="about_privacy">The microphone is used only while you are recording. The app never sends a recording anywhere: they leave the phone only in a backup you save yourself, to the place you choose. \"Feed the llamas\" in About opens a donation page (square.link) in your browser, only when you press it. The app sends nothing there; if you give, the payment is handled on that page by Square, not by this app.</string>
     <string name="about_privacy_net">The app goes online only to fetch the speech model for a language other than English, a download that carries nothing you have recorded, and, if you turn it on in Settings, to send the words of your dreams to your own Nextcloud. It connects only to the servers you set up, your sign-in details are kept on this phone encrypted, and nothing is sent to the app\'s maker.</string>
     <string name="about_privacy_rest">If you keep dreams in Memo, Memo has the words. There are no ads, no analytics and no tracking. Exports go only where you choose to save them.</string>
     <string name="about_terms_title">Terms</string>
