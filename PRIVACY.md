@@ -30,9 +30,7 @@ android.permission.WAKE_LOCK
 The microphone is the only one that touches anything of yours. It is used only while a
 recording is running: from the press of a volume key to the next press, or to twenty seconds of
 quiet, or to five minutes at the longest. Armed and waiting, the app is listening for the
-volume key, not to the room. Android does not tell the app where a volume change came from, so
-while it is armed, a volume change made by another app on the phone may also start a recording;
-the one buzz still tells you it has started.
+volume key, not to the room.
 
 The speech recognition is whisper.cpp, running on the phone's own processor. It is not a
 service. The English model is packed inside the app.
