@@ -28,16 +28,16 @@ import java.util.concurrent.Executors
  * "Keep dreams in Memo": each dream's words also kept as a Markdown note in Memo, in a
  * Dreams folder, so they sync wherever Memo syncs and turn up in its search.
  *
- * Notes takes them through a small provider of its own, which answers only to the released
+ * Memo takes them through a small provider of its own, which answers only to the released
  * Dream Log. This path sends nothing over the network itself (Nextcloud sending, in cloud/, is
- * separate); Notes does that part, if it has been set up to. The other way round, nothing is sent until the app answering for
- * Notes' provider is shown to be Notes: its package name and the certificate its releases are
+ * separate); Memo does that part, if it has been set up to. The other way round, nothing is sent until the app answering for
+ * Memo's provider is shown to be Memo: its package name and the certificate its releases are
  * signed with. Android gives a provider's name to whichever app claims it first, so a name alone
  * proves nothing.
  *
  * It follows the log rather than being told about each change: whenever the list of dreams
  * changes, every dream with words that has no note yet gets one, and every note whose dream has
- * gone is removed. So a dream that could not be sent because Notes was busy or away is sent
+ * gone is removed. So a dream that could not be sent because Memo was busy or away is sent
  * with the next change, and nothing here ever holds up a recording or a delete. The paths it
  * has written are remembered per dream, so a note keeps its name.
  */
@@ -50,8 +50,8 @@ object InNotes {
     private const val PATH = "path:"
 
     /**
-     * What Notes said when asked. [REFUSED] is Notes turning this app away; [NOT_NOTES] is this
-     * app turning away another app answering in Notes' place.
+     * What Memo said when asked. [REFUSED] is Memo turning this app away; [NOT_NOTES] is this
+     * app turning away another app answering in Memo's place.
      */
     enum class Answer { OK, NOT_INSTALLED, TOO_OLD, NOT_SET_UP, REFUSED, NOT_NOTES, FAILED }
 
@@ -74,7 +74,7 @@ object InNotes {
     }
 
     /**
-     * Asks Notes whether it will take dreams, and if it will, turns this on and sends every
+     * Asks Memo whether it will take dreams, and if it will, turns this on and sends every
      * dream across. [answer] is called on the main thread.
      */
     fun turnOn(answer: (Answer) -> Unit) {
@@ -89,7 +89,7 @@ object InNotes {
     }
 
     /**
-     * The notes already in Notes stay there. What was sent is forgotten, so turning it on again
+     * The notes already in Memo stay there. What was sent is forgotten, so turning it on again
      * sends everything again, to the same names.
      */
     fun turnOff() {
@@ -128,7 +128,7 @@ object InNotes {
         Log.w(TAG, "$method: $said; will try again when the log next changes")
     }
 
-    /** Tells an absent Notes from one too old to have the provider. */
+    /** Tells an absent Memo from one too old to have the provider. */
     private fun missing(): Answer = try {
         app.packageManager.getPackageInfo(NOTES, 0)
         Answer.TOO_OLD
@@ -136,7 +136,7 @@ object InNotes {
         Answer.NOT_INSTALLED
     }
 
-    /** The app now answering for Notes' provider, checked; null when it is Notes. */
+    /** The app now answering for Memo's provider, checked; null when it is Memo. */
     private fun notNotes(): Answer? {
         val pm = app.packageManager
         val owner = try {
@@ -152,17 +152,17 @@ object InNotes {
             emptyList()
         }
         if (NotesIdentity.isNotes(owner, certs, BuildConfig.DEBUG)) return null
-        Log.w(TAG, "the provider for Notes belongs to another app; nothing sent")
+        Log.w(TAG, "the provider for Memo belongs to another app; nothing sent")
         return Answer.NOT_NOTES
     }
 
     private fun call(method: String, arg: String?, extras: Bundle? = null): Answer {
-        // Checked before every call, not once at turning on: Notes may have gone since.
+        // Checked before every call, not once at turning on: Memo may have gone since.
         notNotes()?.let { return it }
         val reply = try {
             app.contentResolver.call(PROVIDER, method, arg, extras)
         } catch (e: IllegalArgumentException) {
-            // "Unknown authority": Notes is not installed, or is a version without the provider.
+            // "Unknown authority": Memo is not installed, or is a version without the provider.
             return missing()
         } catch (e: SecurityException) {
             return Answer.REFUSED

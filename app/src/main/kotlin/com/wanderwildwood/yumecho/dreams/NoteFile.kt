@@ -3,7 +3,7 @@ package com.wanderwildwood.yumecho.dreams
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-/** Where dreams go in Notes, relative to wherever Notes keeps its notes. */
+/** Where dreams go in Memo, relative to wherever Memo keeps its notes. */
 const val NOTES_FOLDER = "Dreams"
 
 private val NOTE_NAME: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")
@@ -12,7 +12,7 @@ private val NOTE_NAME: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-
  * The note a dream is kept in: "Dreams/2026-10-05 0712.md", for when the recording began.
  *
  * Named for the time rather than the words, so the name does not change under the reader in
- * Notes, and so one sorts beside the next in the folder. Two recordings can begin in the same
+ * Memo, and so one sorts beside the next in the folder. Two recordings can begin in the same
  * minute; the second is "0712 (2)". [taken] is every path already given to another dream, and
  * a path once given is kept for that dream, so this is asked only once per dream.
  */

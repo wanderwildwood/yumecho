@@ -1,10 +1,10 @@
 package com.wanderwildwood.yumecho.notes
 
-/** Who Notes is: its package name and the certificate its releases are signed with. */
+/** Who Memo is: its package name and the certificate its releases are signed with. */
 internal object NotesIdentity {
     const val NOTES = "com.wanderwildwood.oboegaki"
 
-    /** The SHA-256 of the certificate Notes' releases are signed with (lower-case hex). */
+    /** The SHA-256 of the certificate Memo's releases are signed with (lower-case hex). */
     const val NOTES_CERT = "20e289f7dcdd22e11dc4dfdb46ecd1b883615f3350904c7575afc1849632514e"
 
     /**
@@ -17,8 +17,8 @@ internal object NotesIdentity {
     )
 
     /**
-     * Whether a provider owned by [owner], signed with [certs], is the real Notes: the package
-     * name must be Notes', and every signer must be its release certificate (or, in a debug build
+     * Whether a provider owned by [owner], signed with [certs], is the real Memo: the package
+     * name must be Memo's, and every signer must be its release certificate (or, in a debug build
      * only, one of the debug ones).
      */
     fun isNotes(owner: String?, certs: List<String>, debug: Boolean): Boolean {

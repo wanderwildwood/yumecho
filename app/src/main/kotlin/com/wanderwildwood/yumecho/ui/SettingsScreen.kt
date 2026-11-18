@@ -75,7 +75,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     }
     val nextcloud by DreamSync.state.collectAsState()
     var on by remember { mutableStateOf(InNotes.on) }
-    // Set while Notes is being asked, so a second press does not ask twice.
+    // Set while Memo is being asked, so a second press does not ask twice.
     var asking by remember { mutableStateOf(false) }
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current

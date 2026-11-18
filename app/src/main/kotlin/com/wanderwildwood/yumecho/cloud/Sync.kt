@@ -50,7 +50,7 @@ fun removalsAreSafe(dreams: List<Dream>, copies: Int): Boolean = dreams.isNotEmp
  * not been sent, or whose words have changed since (by [wordsPrint], so a new language or clock
  * setting sends nothing); and the removal of the copy of every dream
  * that is gone. A dream keeps the name it was first sent under, so nothing is renamed. Names
- * are the time the recording began ("2026-10-05 0712.md"), as in Notes.
+ * are the time the recording began ("2026-10-05 0712.md"), as in Memo.
  *
  * [render] is a dream as the text of its file. Worked out without a phone or a network.
  */

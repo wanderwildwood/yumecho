@@ -39,7 +39,7 @@ internal val http = OkHttpClient.Builder()
  * password. Nobody types the account's password into this app, and two-factor works because it
  * is the server's own page. A phone with no browser takes an app password typed in instead.
  *
- * The same as Notes' and Recipes', each app with its own copy.
+ * The same as Memo's and Recipes', each app with its own copy.
  */
 object LoginFlow {
 
