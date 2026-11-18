@@ -86,10 +86,16 @@ class ArmService : Service() {
     /**
      * The disarm after [LONGEST_NIGHT], by the clock that keeps counting while the phone sleeps:
      * a delay on the main thread counts only time awake, and a sleeping phone could take days
-     * to reach it. Not exact, so it needs no permission; Android may hold it a little.
+     * to reach it. Not exact, so it needs no permission; Android may hold it a little. Coming
+     * in the middle of a recording, it waits for that dream to end.
      */
-    private val expire = AlarmManager.OnAlarmListener { stopSelf() }
+    private val expire = AlarmManager.OnAlarmListener {
+        if (recorder.isRecording) lastDream = true else stopSelf()
+    }
     private var armedAt = 0L
+
+    /** The night is over: the recording under way is the last, and it disarms when it ends. */
+    private var lastDream = false
 
     /**
      * The volume the keys move while armed: a pretend one, held in the middle so a press is
@@ -195,6 +201,7 @@ class ArmService : Service() {
                 if (armed) Night.current.value = Night.State.ARMED
                 buzz(Buzz.afterRecording(done))
                 Transcriber.catchUp(this)
+                if (lastDream) stopSelf()
             }
         }
     }
@@ -223,13 +230,10 @@ class ArmService : Service() {
 
     private fun pressed() {
         val now = SystemClock.elapsedRealtime()
-        // Should the disarm above be held back by Android, a press after the longest night
-        // disarms all the same.
-        if (now - armedAt > LONGEST_NIGHT && !recorder.isRecording) {
-            stopSelf()
-            return
-        }
         if (now - lastPress < DEBOUNCE) return
+        // Should the disarm above be held back by Android, a press after the longest night is
+        // most likely a dream to tell: it is recorded, and the app disarms when it ends.
+        if (now - armedAt > LONGEST_NIGHT) lastDream = true
         lastPress = now
         if (recorder.isRecording) {
             recorder.stop()
@@ -241,6 +245,7 @@ class ArmService : Service() {
             } else {
                 wakeLock.release()
                 buzz(Buzz.NOTHING)
+                if (lastDream) stopSelf()
             }
         }
     }

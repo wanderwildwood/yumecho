@@ -32,7 +32,7 @@ On a Kompakt, a minute of speech takes about half a minute to write down.
   than handed to the recognizer, which, given silence, invents a polite "Thank you."
 - **In the morning** the log shows each night's dreams, and each one keeps its recording. The
   phone mishears, especially someone half asleep, and the recording is the real one.
-- It disarms itself after twelve hours.
+- It disarms itself after twelve hours, or, if a dream is being recorded then, as soon as it ends.
 - **To write them up**, "Save the words to a file" at the foot of the log saves every dream in
   one Markdown file, oldest night first, to copy to a computer. The recordings stay on the
   phone.
