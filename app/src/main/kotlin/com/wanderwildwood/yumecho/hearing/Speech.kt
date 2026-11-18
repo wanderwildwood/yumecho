@@ -61,7 +61,13 @@ object Speech {
 
     private lateinit var app: Context
     private val worker = Executors.newSingleThreadExecutor { Thread(it, "speech") }
-    @Volatile private var cancelled = false
+    /**
+     * Counts choices and stops. A download, or the deletion choosing English queues, acts only
+     * while no later choice has been made, so two quick choices can never leave the language
+     * pointing at a model that a queued deletion has just taken away.
+     */
+    @Volatile private var generation = 0
+    private val choosing = Any()
 
     private val model get() = File(File(app.filesDir, "speech"), MODEL_NAME)
     private val prefs get() = app.getSharedPreferences("speech", Context.MODE_PRIVATE)
@@ -97,34 +103,54 @@ object Speech {
      */
     fun choose(context: Context, language: String) {
         init(context)
-        if (language == "en") {
-            cancelled = true
-            keep("en")
-            _state.value = State.Idle
-            worker.execute {
-                model.delete()
-                File(model.path + ".part").delete()
+        val mine = synchronized(choosing) {
+            val now = ++generation
+            if (language == "en") {
+                keep("en")
+                _state.value = State.Idle
+            } else if (model.isFile) {
+                keep(language)
+                _state.value = State.Idle
+                return
+            } else {
+                _state.value = State.Downloading(language, 0)
             }
-            return
+            now
         }
-        if (model.isFile) {
-            keep(language)
-            _state.value = State.Idle
-            return
+        if (language == "en") {
+            worker.execute {
+                synchronized(choosing) {
+                    if (mine == generation) {
+                        model.delete()
+                        File(model.path + ".part").delete()
+                    }
+                }
+            }
+        } else {
+            worker.execute { download(language, mine) }
         }
-        cancelled = false
-        _state.value = State.Downloading(language, 0)
-        worker.execute { download(language) }
     }
 
     /** Stop a download in progress; the half-file goes and the language stays as it was. */
     fun cancel() {
-        if (_state.value !is State.Downloading) return
-        cancelled = true
-        _state.value = State.Idle
+        synchronized(choosing) {
+            if (_state.value !is State.Downloading) return
+            generation++
+            _state.value = State.Idle
+        }
     }
 
-    private fun download(language: String) {
+    private fun download(language: String, mine: Int) {
+        // Already here, fetched by an earlier choice that finished first: nothing to fetch twice.
+        if (model.isFile) {
+            synchronized(choosing) {
+                if (mine == generation) {
+                    keep(language)
+                    _state.value = State.Idle
+                }
+            }
+            return
+        }
         val part = File(model.path + ".part")
         part.parentFile?.mkdirs()
         val ok = runCatching {
@@ -140,7 +166,7 @@ object Speech {
                     part.outputStream().use { output ->
                         val buffer = ByteArray(64 * 1024)
                         while (true) {
-                            if (cancelled) error("cancelled")
+                            if (mine != generation) error("cancelled")
                             val n = input.read(buffer)
                             if (n < 0) break
                             got += n
@@ -162,12 +188,14 @@ object Speech {
             }
         }.getOrDefault(false)
         if (!ok) part.delete()
-        if (cancelled) return
-        if (ok) {
-            keep(language)
-            _state.value = State.Idle
-        } else {
-            _state.value = State.Failed(language)
+        synchronized(choosing) {
+            if (mine != generation) return
+            if (ok) {
+                keep(language)
+                _state.value = State.Idle
+            } else {
+                _state.value = State.Failed(language)
+            }
         }
     }
 
