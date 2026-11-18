@@ -53,8 +53,16 @@ files/dreams/20260926-031204.wav   the recording
 files/dreams/20260926-031204.txt   what the phone heard in it
 ```
 
-The file name is when the recording began. That is all of it, and, if the setting below is on, a list of which dreams have been
-handed to Memo and under what name: no account, no log of when the app was armed.
+The file name is when the recording began. A recording still being made, or a backup being
+read back in, sits in a working file or folder beside them until it is done.
+
+Beside the dreams, in the app's private preferences: if the setting below is on, a list of which
+dreams have been handed to Memo and under what name; if Nextcloud sending is used, the sign-in
+described further down and a record of which dreams were sent there and under what name; the
+chosen language, with its downloaded model in `files/speech`; how many times each recording still
+waiting for its words has been tried; the dark mode choice; and, for the DuraSpeed hint, your
+word that Dream Log is allowed there and when DuraSpeed last stopped it. No account, no log of
+when the app was armed.
 
 Deleting a dream deletes both files. Uninstalling the app deletes all of them.
 
