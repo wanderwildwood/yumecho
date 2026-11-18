@@ -41,7 +41,9 @@ On a Kompakt, a minute of speech takes about half a minute to write down.
   named for when the recording began ("Dreams/2026-10-05 0712.md"), so they sync wherever
   Memo syncs, turn up in its search, and open in any Markdown editor. A deleted dream's note is
   deleted too. The recordings are not copied. Memo takes them only from the released Dream
-  Log, and Dream Log asks Memo before it turns the setting on.
+  Log, and Dream Log asks Memo before it turns the setting on. Before every send it checks that
+  the app answering is Memo itself, by its package name and the certificate it is signed with,
+  and sends nothing otherwise.
 - **Kept in your Nextcloud**, if you sign in under Settings > Nextcloud and turn on sending: the
   words of each dream (never the recordings) are saved as Markdown files in a folder of your own
   Nextcloud, over https. Sign-in is Nextcloud's own page (Login Flow v2); the app password it hands
@@ -63,7 +65,9 @@ and it works the same with the phone set to ring, vibrate or silent.
 
 ## Permissions
 
-`RECORD_AUDIO`, to record. The recognition runs on the phone, and nothing it hears leaves it.
+`RECORD_AUDIO`, to record. `FOREGROUND_SERVICE`, `WAKE_LOCK` and `VIBRATE` keep it listening
+for the key through the night and give the buzzes. The recognition runs on the phone, and
+nothing it hears leaves it.
 `INTERNET`, only to download the listening model for a language other than English, when one
 is chosen in the settings, and to send the words of dreams to your own Nextcloud, if you turn that on;
 with neither, the app never goes online. With "Keep dreams in Memo" on, the
