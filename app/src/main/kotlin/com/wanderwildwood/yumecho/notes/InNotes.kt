@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import com.wanderwildwood.yumecho.BuildConfig
+import com.wanderwildwood.yumecho.cloud.removalsAreSafe
 import com.wanderwildwood.yumecho.dreams.Dream
 import com.wanderwildwood.yumecho.dreams.Dreams
 import com.wanderwildwood.yumecho.dreams.noteText
@@ -99,8 +100,11 @@ object InNotes {
             .mapKeys { it.key.removePrefix(PATH) }
             .mapValues { it.value as String }
         val here = dreams.mapTo(HashSet()) { it.stamp }
+        // An empty log answering for several notes may be one that could not be read: no note is
+        // removed on it, as with the Nextcloud copies.
+        val mayRemove = removalsAreSafe(dreams, sent.size)
         for ((stamp, path) in sent) {
-            if (stamp in here) continue
+            if (stamp in here || !mayRemove) continue
             val said = call("remove", path)
             if (said == Answer.OK) prefs.edit().remove(PATH + stamp).apply() else return giveUp("remove", said)
         }

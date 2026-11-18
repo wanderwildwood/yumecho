@@ -40,7 +40,10 @@ fun wordsPrint(dream: Dream): String = fingerprint("dream-words-1\n${dream.stamp
  * and acting on it would delete every copy: so nothing is removed then. One dream deleted by the
  * reader still removes its own copy, including the last one.
  */
-fun removalsAreSafe(dreams: List<Dream>, sent: Map<String, Sent>): Boolean = dreams.isNotEmpty() || sent.size <= 1
+fun removalsAreSafe(dreams: List<Dream>, sent: Map<String, Sent>): Boolean = removalsAreSafe(dreams, sent.size)
+
+/** The same rule for anything else that follows the log, such as the notes in Memo. */
+fun removalsAreSafe(dreams: List<Dream>, copies: Int): Boolean = dreams.isNotEmpty() || copies <= 1
 
 /**
  * What it takes to make the folder match the log: a copy of every dream that has words and has

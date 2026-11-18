@@ -301,6 +301,13 @@ class SyncGuardTest {
     }
 
     @Test
+    fun `an empty log never removes several notes from Memo`() {
+        assertFalse(removalsAreSafe(emptyList(), 3))
+        assertTrue(removalsAreSafe(emptyList(), 1))
+        assertTrue(removalsAreSafe(listOf(dream("20261001-010101", "a dream")), 3))
+    }
+
+    @Test
     fun `the last copy still goes when its one dream is deleted`() {
         val one = mapOf("20261001-010101" to Sent("2026-10-01 0101.md", "x"))
         assertEquals(listOf<Step>(Step.Remove("20261001-010101", "2026-10-01 0101.md")), plan(emptyList(), one) { "" })
