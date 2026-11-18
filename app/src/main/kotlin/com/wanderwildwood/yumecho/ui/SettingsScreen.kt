@@ -60,9 +60,9 @@ import androidx.compose.ui.semantics.toggleableState
 private val backupWork = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 /**
- * Two settings: keeping dreams in Notes as well, and the language dreams are heard in.
+ * Two settings: keeping dreams in Memo as well, and the language dreams are heard in.
  *
- * Turning it on asks Notes first, and stays off if Notes says no, saying why in a dialog: a
+ * Turning it on asks Memo first, and stays off if Memo says no, saying why in a dialog: a
  * switch that showed on while nothing was being kept would be the one lie on the screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)

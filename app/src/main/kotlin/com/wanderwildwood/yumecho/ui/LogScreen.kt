@@ -34,7 +34,7 @@ import com.wanderwildwood.yumecho.night.Night
 /**
  * The whole app: arm it at night, read it in the morning.
  *
- * Its one setting, keeping dreams in Notes, is behind the cog. How long it waits in silence
+ * Its settings, keeping dreams in Memo among them, are behind the cog. How long it waits in silence
  * before it stops, and how long a night lasts, were each set once to what a person half asleep
  * needs, and a screen of knobs for them would be read by nobody at three in the morning.
  */

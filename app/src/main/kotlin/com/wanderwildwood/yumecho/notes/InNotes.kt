@@ -25,8 +25,8 @@ import java.security.MessageDigest
 import java.util.concurrent.Executors
 
 /**
- * "Keep dreams in Notes": each dream's words also kept as a Markdown note in Notes, in a
- * Dreams folder, so they sync wherever Notes syncs and turn up in its search.
+ * "Keep dreams in Memo": each dream's words also kept as a Markdown note in Memo, in a
+ * Dreams folder, so they sync wherever Memo syncs and turn up in its search.
  *
  * Notes takes them through a small provider of its own, which answers only to the released
  * Dream Log. This path sends nothing over the network itself (Nextcloud sending, in cloud/, is

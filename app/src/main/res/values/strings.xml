@@ -85,21 +85,21 @@
     <string name="settings_duraspeed">The phone\'s DuraSpeed setting can shut Dream Log down in the night, so a press is never heard. Open DuraSpeed, tap Open, and switch Dream Log on.</string>
     <!-- Top bar button, read aloud by a screen reader -->
     <string name="settings_cd_back">Back</string>
-    <!-- A switch. "Notes" is the name of another app, the note-taking one -->
+    <!-- A switch. "Memo" is the name of another app, the note-taking one -->
     <string name="settings_notes">Keep dreams in Memo</string>
     <!-- Under the switch -->
     <string name="settings_notes_what">Each dream\'s words as a note in a Dreams folder. The recordings stay here.</string>
-    <!-- Said when the switch is pressed and Notes is not on the phone, or is too old to take dreams -->
+    <!-- Said when the switch is pressed and Memo is not on the phone, or is too old to take dreams -->
     <string name="settings_notes_missing">Memo is not installed on this phone.</string>
-    <!-- Said when Notes is installed but its version has no way of taking dreams -->
+    <!-- Said when Memo is installed but its version has no way of taking dreams -->
     <string name="settings_notes_too_old">Memo is installed, but this version cannot take dreams. Update Memo and try again.</string>
-    <!-- Said when Notes is on the phone but has not been given a place to keep notes -->
+    <!-- Said when Memo is on the phone but has not been given a place to keep notes -->
     <string name="settings_notes_not_set_up">Memo has nowhere to keep notes yet. Open Memo and choose a place first.</string>
-    <!-- Said when Notes will not take dreams from this copy of Dream Log -->
+    <!-- Said when Memo will not take dreams from this copy of Dream Log -->
     <string name="settings_notes_refused">Memo takes dreams only from the released Dream Log, and this one is not it.</string>
     <!-- Said when the app answering in Memo's place is not the released Memo, so this app sends it nothing -->
     <string name="settings_notes_not_memo">The app answering as Memo is not the released Memo, so nothing was sent.</string>
-    <!-- Said when Notes could not be reached for any other reason -->
+    <!-- Said when Memo could not be reached for any other reason -->
     <string name="settings_notes_failed">Memo did not answer. Nothing has been changed.</string>
     <!-- Button that closes that message -->
     <string name="settings_close">Close</string>

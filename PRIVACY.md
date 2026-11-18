@@ -120,7 +120,7 @@ Signing in alone sends nothing.
   signed out. `android:allowBackup="false"` keeps all of it out of cloud backups.
 - **Kept on the server:** the files are ordinary text, readable by anyone who can open that
   Nextcloud account, and as protected as the rest of that account is. They are not encrypted by
-  the app, so that Notes, a text editor or a new phone can read them.
+  the app, so that a notes app, a text editor or a new phone can read them.
 - **Deleting:** with sending on, deleting a dream deletes its copy on the server. Turning
   sending off, or signing out, leaves the copies already there. Signing out also deletes the
   app password on the server.
