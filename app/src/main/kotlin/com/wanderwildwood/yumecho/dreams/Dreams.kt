@@ -55,8 +55,15 @@ object Dreams {
     /** Where the next recording goes while it is being made. */
     fun newRecording(time: LocalDateTime): File = File(dir, "${time.format(Dream.STAMP)}.wav.part")
 
-    /** A finished recording, named so that it is listed and transcribed. */
-    fun finish(part: File): File {
+    /**
+     * A finished recording, named so that it is listed and transcribed; or let go, and null, if
+     * it holds under a second (a microphone that failed at once), as after a stop.
+     */
+    fun finish(part: File): File? {
+        if (part.length() < Wav.HEADER + Wav.RATE * 2) {
+            part.delete()
+            return null
+        }
         val done = File(dir, part.name.removeSuffix(".part"))
         part.renameTo(done)
         refresh()

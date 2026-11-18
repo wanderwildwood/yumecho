@@ -19,7 +19,7 @@ import kotlin.math.sqrt
  * dream and gone back to sleep will not press the key again, and at [LONGEST] seconds, because
  * a recording left running all night is not a dream.
  */
-class Recorder(private val onFinished: (File, Stop) -> Unit) {
+class Recorder(private val onFinished: (File?, Stop) -> Unit) {
     enum class Stop { PRESSED, QUIET, LONGEST, FAILED }
 
     companion object {
@@ -116,7 +116,7 @@ class Recorder(private val onFinished: (File, Stop) -> Unit) {
             c.running = false
             // Never thrown out of here: this thread ending in an error would end the app, and
             // the night armed with it.
-            val done = runCatching { Dreams.finish(part) }.getOrDefault(part)
+            val done = runCatching { Dreams.finish(part) }.getOrNull()
             capture = null
             onFinished(done, why)
         }
