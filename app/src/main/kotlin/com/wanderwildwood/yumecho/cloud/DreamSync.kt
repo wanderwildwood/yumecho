@@ -26,7 +26,7 @@ import java.util.concurrent.Executors
 enum class SignIn { IDLE, WAITING, CHECKING }
 
 enum class Problem {
-    PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT, BAD_LINK, NEEDS_ADDRESS, NEEDS_USER,
+    PLAIN_HTTP, UNREACHABLE, REFUSED, NO_BROWSER, NOT_KEPT, TIMED_OUT, BAD_LINK, OTHER_SERVER, NEEDS_ADDRESS, NEEDS_USER,
     BAD_ADDRESS, NOT_FOUND, CERTIFICATE, NOT_NEXTCLOUD, WRONG_PASSWORD, OTHER,
     /** Not a problem: a Test that worked. */
     TEST_GOOD,
@@ -244,7 +244,10 @@ object DreamSync {
                 }
                 if (got != null) {
                     if (!LoginFlow.acceptableLoginUrl(got.server, typed)) {
-                        _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.BAD_LINK) }
+                        // The app password the server has just made is not kept, so it is taken
+                        // back (best effort) from the server typed, where it was handed over.
+                        LoginFlow.revoke(Account(LoginFlow.normalise(typed), got.user, got.password))
+                        _state.update { it.copy(signIn = SignIn.IDLE, problem = Problem.OTHER_SERVER) }
                         return@launch
                     }
                     keep(got)

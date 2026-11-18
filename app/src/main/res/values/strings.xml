@@ -212,6 +212,8 @@
     <string name="nc_not_kept">The app password could not be kept safely on this phone, so it was not kept.</string>
     <string name="nc_timed_out">Signing in took longer than Nextcloud allows. Try again.</string>
     <string name="nc_bad_link">The server sent a sign-in page on another address, or one that is not https, so it was not opened. Type an app password instead.</string>
+    <!-- After signing in on Nextcloud's page, the server named an address for the account other than the one typed -->
+    <string name="nc_other_server">Nextcloud named another address for this account, or one that is not https, so the sign-in was not kept and its app password was taken back. Type an app password instead.</string>
     <string name="nc_needs_address">Set the Nextcloud address first.</string>
     <string name="nc_needs_user">Set the login name first, then the app password.</string>
     <string name="nc_cancel">Cancel</string>

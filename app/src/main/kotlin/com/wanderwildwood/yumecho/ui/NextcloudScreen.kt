@@ -131,6 +131,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
                                     Problem.NOT_KEPT -> R.string.nc_not_kept
                                     Problem.TIMED_OUT -> R.string.nc_timed_out
                                     Problem.BAD_LINK -> R.string.nc_bad_link
+                                    Problem.OTHER_SERVER -> R.string.nc_other_server
                                     Problem.NEEDS_ADDRESS -> R.string.nc_needs_address
                                     Problem.NEEDS_USER -> R.string.nc_needs_user
                                     Problem.BAD_ADDRESS -> R.string.nc_bad_address
