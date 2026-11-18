@@ -342,6 +342,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                         InNotes.Answer.TOO_OLD -> R.string.settings_notes_too_old
                         InNotes.Answer.NOT_SET_UP -> R.string.settings_notes_not_set_up
                         InNotes.Answer.REFUSED -> R.string.settings_notes_refused
+                        InNotes.Answer.NOT_NOTES -> R.string.settings_notes_not_memo
                         else -> R.string.settings_notes_failed
                     },
                 ),

@@ -49,8 +49,11 @@ object InNotes {
     private const val ON = "on"
     private const val PATH = "path:"
 
-    /** What Notes said when asked. */
-    enum class Answer { OK, NOT_INSTALLED, TOO_OLD, NOT_SET_UP, REFUSED, FAILED }
+    /**
+     * What Notes said when asked. [REFUSED] is Notes turning this app away; [NOT_NOTES] is this
+     * app turning away another app answering in Notes' place.
+     */
+    enum class Answer { OK, NOT_INSTALLED, TOO_OLD, NOT_SET_UP, REFUSED, NOT_NOTES, FAILED }
 
     private lateinit var app: Context
     private lateinit var prefs: SharedPreferences
@@ -150,7 +153,7 @@ object InNotes {
         }
         if (NotesIdentity.isNotes(owner, certs, BuildConfig.DEBUG)) return null
         Log.w(TAG, "the provider for Notes belongs to another app; nothing sent")
-        return Answer.REFUSED
+        return Answer.NOT_NOTES
     }
 
     private fun call(method: String, arg: String?, extras: Bundle? = null): Answer {

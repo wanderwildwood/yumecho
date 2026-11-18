@@ -97,6 +97,8 @@
     <string name="settings_notes_not_set_up">Memo has nowhere to keep notes yet. Open Memo and choose a place first.</string>
     <!-- Said when Notes will not take dreams from this copy of Dream Log -->
     <string name="settings_notes_refused">Memo takes dreams only from the released Dream Log, and this one is not it.</string>
+    <!-- Said when the app answering in Memo's place is not the released Memo, so this app sends it nothing -->
+    <string name="settings_notes_not_memo">The app answering as Memo is not the released Memo, so nothing was sent.</string>
     <!-- Said when Notes could not be reached for any other reason -->
     <string name="settings_notes_failed">Memo did not answer. Nothing has been changed.</string>
     <!-- Button that closes that message -->
