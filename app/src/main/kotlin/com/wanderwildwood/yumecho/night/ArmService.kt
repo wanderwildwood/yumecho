@@ -1,5 +1,6 @@
 package com.wanderwildwood.yumecho.night
 
+import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -81,7 +82,12 @@ class ArmService : Service() {
     private var armed = false
     private var lastPress = 0L
 
-    private val expire = Runnable { stopSelf() }
+    /**
+     * The disarm after [LONGEST_NIGHT], by the clock that keeps counting while the phone sleeps:
+     * a delay on the main thread counts only time awake, and a sleeping phone could take days
+     * to reach it. Not exact, so it needs no permission; Android may hold it a little.
+     */
+    private val expire = AlarmManager.OnAlarmListener { stopSelf() }
     private var armedAt = 0L
 
     /**
@@ -205,7 +211,9 @@ class ArmService : Service() {
 
         holdTheKeys()
         armedAt = SystemClock.elapsedRealtime()
-        main.postDelayed(expire, LONGEST_NIGHT)
+        getSystemService(AlarmManager::class.java).set(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP, armedAt + LONGEST_NIGHT, "yumecho:disarm", expire, main,
+        )
         Night.current.value = Night.State.ARMED
         // Not sticky: if Android kills it, it stays off rather than coming back without the
         // microphone, which a restart from the background would not be allowed to use.
@@ -214,8 +222,8 @@ class ArmService : Service() {
 
     private fun pressed() {
         val now = SystemClock.elapsedRealtime()
-        // The delayed disarm counts only time awake, and a sleeping phone can take days to
-        // reach it: a press after the longest night, by the clock that counts sleep, disarms.
+        // Should the disarm above be held back by Android, a press after the longest night
+        // disarms all the same.
         if (now - armedAt > LONGEST_NIGHT && !recorder.isRecording) {
             stopSelf()
             return
@@ -244,6 +252,7 @@ class ArmService : Service() {
     override fun onDestroy() {
         main.removeCallbacksAndMessages(null)
         if (armed) {
+            getSystemService(AlarmManager::class.java).cancel(expire)
             letGoOfTheKeys()
             if (recorder.isRecording) recorder.stop()
         }
