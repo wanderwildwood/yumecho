@@ -129,6 +129,8 @@ private fun DreamLog() {
                 val ok = runCatching {
                     context.contentResolver.openOutputStream(uri, "wt")!!.bufferedWriter().use { it.write(text) }
                 }.isSuccess
+                // A failed write must not leave a cut-off file behind, so "nothing was saved" is true.
+                if (!ok) runCatching { android.provider.DocumentsContract.deleteDocument(context.contentResolver, uri) }
                 exported = ok
             }
         }
@@ -194,7 +196,10 @@ private fun DreamLog() {
             onOpen = { open = it.stamp },
             onSettings = { settingsOpen = true },
             exported = exported,
-            onExport = { export.launch("dreams-${LocalDate.now()}.md") },
+            // A phone with nothing that can save a file says so, rather than the app stopping.
+            onExport = {
+                if (runCatching { export.launch("dreams-${LocalDate.now()}.md") }.isFailure) exported = false
+            },
         )
     }
 
