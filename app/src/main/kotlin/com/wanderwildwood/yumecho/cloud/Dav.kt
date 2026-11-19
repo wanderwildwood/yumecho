@@ -15,7 +15,7 @@ import java.net.URLEncoder
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * The dreams folder in a Nextcloud, over WebDAV: `remote.php/dav/files/<user>/<folder>/`.
+ * The dreams folder in a Nextcloud, over WebDAV: `remote.php/dav/files/<uid>/<folder>/`.
  *
  * Five calls and nothing else: PROPFIND to check a sign-in and to see what the folder holds,
  * MKCOL to make a folder that is missing, PUT to send a dream's words, and DELETE to remove the
@@ -26,7 +26,7 @@ class DreamFolder(
     folder: String,
     private val client: OkHttpClient = http,
 ) {
-    private val home = account.server.trimEnd('/') + "/remote.php/dav/files/" + encodePath(account.user) + "/"
+    private val home = account.server.trimEnd('/') + "/remote.php/dav/files/" + encodePath(account.uid) + "/"
     private val root = folder.trim('/', ' ')
 
     private fun request(url: String) = Request.Builder().url(url)
@@ -85,7 +85,7 @@ class DreamFolder(
         try {
             propfind(home, 0)
         } catch (_: Missing) {
-            throw Refused("no files for ${account.user}")
+            throw Refused("no files for ${account.uid}")
         }
     }
 

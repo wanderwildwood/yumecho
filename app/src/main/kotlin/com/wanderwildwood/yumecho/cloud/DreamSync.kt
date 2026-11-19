@@ -165,7 +165,8 @@ object DreamSync {
     private fun account(): Account? {
         if (homeWho() != null) {
             if (homeStamp().isEmpty()) return null
-            return held?.let { Account(it.server, it.user, it.password) }
+            // Signs in with the login name, builds paths with the user id.
+            return held?.let { Account(it.server, it.user, it.password, it.uid) }
         }
         return ownAccount()
     }
@@ -245,7 +246,7 @@ object DreamSync {
         }
     }
 
-    /** "Stop using it": Home's account is let go here (Home stays signed in) and the sign-in here is empty. */
+    /** "Stop using it": Home's account is let go here (Home itself is not signed out) and the sign-in here is empty. */
     fun stopHome() {
         scope.launch {
             held = null

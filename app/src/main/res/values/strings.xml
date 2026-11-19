@@ -227,6 +227,7 @@
     <string name="home_account_signed_out">Home is signed out of Nextcloud, so this app is too. Your %1$s stay on the phone.</string>
     <string name="home_account_what">dreams</string>
     <string name="nc_home_stop_note">Stops sending and lets Home\'s account go here. Home stays signed in, and copies already in Nextcloud stay.</string>
+    <string name="nc_home_stop_note_out">Lets Home\'s account go here, so you can sign in here instead. Copies already in Nextcloud stay.</string>
 
     <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>

@@ -115,7 +115,7 @@ fun NextcloudScreen(onBack: () -> Unit) {
             if (state.home && state.homeOut) {
                 // Home signed out (or is gone): so is this app, quietly, until Home has the account again.
                 item { Note(stringResource(R.string.home_account_signed_out, stringResource(R.string.home_account_what))) }
-                item { Choice(stringResource(R.string.home_account_stop), stringResource(R.string.nc_home_stop_note), DreamSync::stopHome) }
+                item { Choice(stringResource(R.string.home_account_stop), stringResource(R.string.nc_home_stop_note_out), DreamSync::stopHome) }
             } else if (state.user != null) {
                 if (!state.home && offered != null) item { useHome() }
                 item {
@@ -258,7 +258,15 @@ fun NextcloudScreen(onBack: () -> Unit) {
     }
 }
 
-private fun hostOf(server: String?): String = server.orEmpty().substringAfter("://").trimEnd('/')
+/**
+ * The server as shown, the same for Home's account and one signed in here: no "https://" or
+ * "http://", no slash at the end, a port kept only when it is not the scheme's own.
+ */
+internal fun hostOf(server: String?): String {
+    val t = server.orEmpty().trim().trimEnd('/')
+    if (t.isEmpty()) return ""
+    return HomeAccount.sameServer(if ("://" in t) t else "https://$t").substringAfter("://")
+}
 
 @Composable
 private fun Note(text: String) {

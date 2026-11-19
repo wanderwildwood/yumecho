@@ -11,9 +11,12 @@ import java.util.concurrent.TimeUnit
 /**
  * A Nextcloud account as its login page hands it over: the server, the user's login name and an
  * app password made for this phone alone, which can be revoked from the server's security
- * settings without touching the real one.
+ * settings without touching the real one. [user] signs in (basic auth); [uid], the user id, is
+ * what file paths are built with (`remote.php/dav/files/<uid>/`). They differ when the login
+ * name is an email address or differs in case; Home hands both, the sign-in here has only the
+ * login name, so there [uid] is [user].
  */
-data class Account(val server: String, val user: String, val password: String)
+data class Account(val server: String, val user: String, val password: String, val uid: String = user)
 
 /** The server could not be reached, or its certificate could not be trusted: nothing was sent. */
 class Unreachable(message: String) : IOException(message)
