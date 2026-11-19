@@ -44,6 +44,12 @@ import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.yumecho.R
 import com.wanderwildwood.yumecho.cloud.DreamSync
+import com.wanderwildwood.yumecho.cloud.HomeAccount
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.wanderwildwood.yumecho.cloud.Problem
 import com.wanderwildwood.yumecho.cloud.SignIn
 import androidx.compose.runtime.withFrameNanos
@@ -61,6 +67,9 @@ private enum class Entry { ADDRESS, USER, PASSWORD, FOLDER }
  * signing in (typed address, login name and app password with a Test button, or Nextcloud's
  * own page in the browser as the second choice), the switch that actually sends, the folder, and signing
  * out. Nothing is sent until the switch is on.
+ *
+ * When Home holds the phone's Nextcloud account and gives it to this app, one more row offers
+ * it: "Use the phone's Nextcloud account", in place of signing in here.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +79,26 @@ fun NextcloudScreen(onBack: () -> Unit) {
     var editing by remember { mutableStateOf<Entry?>(null) }
     var user by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Whether Home has an account for this app: asked off the main thread as the screen opens,
+    // again on each change notice from Home, and after a switch here. Only who and where.
+    val context = LocalContext.current
+    var homeNotices by remember { mutableIntStateOf(0) }
+    DisposableEffect(Unit) {
+        val stop = HomeAccount.observe(context) { homeNotices++ }
+        onDispose { stop() }
+    }
+    var offered by remember { mutableStateOf<Pair<String, String>?>(null) }
+    LaunchedEffect(homeNotices, state.home, state.user) {
+        offered = withContext(Dispatchers.IO) {
+            runCatching { HomeAccount.read(context) }.getOrNull()?.let { it.user to hostOf(it.server) }
+        }
+    }
+    val useHome: @Composable () -> Unit = {
+        offered?.let { (who, where) ->
+            Choice(stringResource(R.string.home_account_use), stringResource(R.string.home_account_in_use, who, where), DreamSync::useHome)
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -83,9 +112,19 @@ fun NextcloudScreen(onBack: () -> Unit) {
         PagedColumn(modifier = Modifier.fillMaxSize().padding(contentPadding), showCutRow = true) {
             item { Note(stringResource(R.string.nc_explain)) }
             item { Note(stringResource(R.string.nc_private)) }
-            if (state.user != null) {
+            if (state.home && state.homeOut) {
+                // Home signed out (or is gone): so is this app, quietly, until Home has the account again.
+                item { Note(stringResource(R.string.home_account_signed_out, stringResource(R.string.home_account_what))) }
+                item { Choice(stringResource(R.string.home_account_stop), stringResource(R.string.nc_home_stop_note), DreamSync::stopHome) }
+            } else if (state.user != null) {
+                if (!state.home && offered != null) item { useHome() }
                 item {
-                    Choice(stringResource(R.string.nc_account), stringResource(R.string.nc_signed_in, state.user.orEmpty(), hostOf(state.server)), {})
+                    Choice(
+                        stringResource(R.string.nc_account),
+                        if (state.home) stringResource(R.string.home_account_in_use, state.user.orEmpty(), hostOf(state.server))
+                        else stringResource(R.string.nc_signed_in, state.user.orEmpty(), hostOf(state.server)),
+                        {},
+                    )
                 }
                 item {
                     Row(
@@ -108,8 +147,13 @@ fun NextcloudScreen(onBack: () -> Unit) {
                 }
                 if (state.on && state.behind) item { Note(stringResource(R.string.nc_behind)) }
                 item { Choice(stringResource(R.string.nc_folder), state.folder, { editing = Entry.FOLDER }) }
-                item { ArmedRow(stringResource(R.string.nc_sign_out), stringResource(R.string.nc_sign_out_armed), stringResource(R.string.nc_sign_out_note)) { DreamSync.signOut() } }
+                if (state.home) {
+                    item { Choice(stringResource(R.string.home_account_stop), stringResource(R.string.nc_home_stop_note), DreamSync::stopHome) }
+                } else {
+                    item { ArmedRow(stringResource(R.string.nc_sign_out), stringResource(R.string.nc_sign_out_armed), stringResource(R.string.nc_sign_out_note)) { DreamSync.signOut() } }
+                }
             } else {
+                if (offered != null) item { useHome() }
                 item { Choice(stringResource(R.string.nc_address), state.typed.ifEmpty { stringResource(R.string.nc_not_set) }, { editing = Entry.ADDRESS }) }
                 item { Choice(stringResource(R.string.nc_user), user.ifEmpty { stringResource(R.string.nc_not_set) }, { editing = Entry.USER }) }
                 item {

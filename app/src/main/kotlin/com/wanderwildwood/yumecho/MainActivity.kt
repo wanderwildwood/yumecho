@@ -32,6 +32,7 @@ import com.wanderwildwood.yumecho.hearing.Transcriber
 import com.wanderwildwood.yumecho.night.ArmService
 import com.wanderwildwood.yumecho.notes.InNotes
 import com.wanderwildwood.yumecho.cloud.DreamSync
+import com.wanderwildwood.yumecho.cloud.HomeAccount
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import com.wanderwildwood.yumecho.night.Night
@@ -89,11 +90,27 @@ class MainActivity : ComponentActivity() {
         return super.dispatchKeyEvent(event)
     }
 
+    /** Stops listening for Home's change notices; set while the app is on screen. */
+    private var stopHome: (() -> Unit)? = null
+
+    override fun onStart() {
+        super.onStart()
+        // Home says when its Nextcloud account changes (signed in, new password, signed out).
+        stopHome = HomeAccount.observe(this) { DreamSync.homeChanged() }
+    }
+
+    override fun onStop() {
+        stopHome?.invoke()
+        stopHome = null
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
         // Anything left unheard, because the phone was switched off or the app was stopped
         // partway, is picked up whenever the app is opened.
         Dreams.refresh()
+        // Also asks Home again, when its Nextcloud account is the one in use.
         DreamSync.syncNow()
         Transcriber.catchUp(this)
     }

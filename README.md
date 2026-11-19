@@ -49,6 +49,8 @@ On a Kompakt, a minute of speech takes about half a minute to write down.
   words of each dream (never the recordings) are saved as Markdown files in a folder of your own
   Nextcloud, over https. Sign-in is Nextcloud's own page (Login Flow v2); the app password it hands
   over is sealed with the Android Keystore. Off by default. A deleted dream's copy is deleted too.
+  If Home, the launcher, is signed in to Nextcloud, "Use the phone's Nextcloud account" uses
+  its account instead, with no sign-in here; when Home signs out, Dream Log stops sending.
 - **The words can be looked up.** A dream's words are selectable, and the menu over them has
   Define, from the Dictionary, behind its ⋮.
 

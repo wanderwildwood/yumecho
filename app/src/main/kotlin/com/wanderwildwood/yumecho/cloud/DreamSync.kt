@@ -68,6 +68,10 @@ data class SyncState(
     val problem: Problem? = null,
     /** The last try to send did not get through; it is tried again at the next change. */
     val behind: Boolean = false,
+    /** The account is Home's (the phone's one Nextcloud account), not one signed in here. */
+    val home: Boolean = false,
+    /** Home's account is chosen, but Home is signed out of it (or gone): nothing is sent. */
+    val homeOut: Boolean = false,
 )
 
 const val DEFAULT_FOLDER = "Dream Log"
@@ -81,6 +85,11 @@ const val DEFAULT_FOLDER = "Dream Log"
  * in the phone's keystore ([Secrets]). With it on, a dream deleted here has its copy deleted
  * there; with it off, copies already there are left alone.
  *
+ * Instead of signing in here, the reader may use the phone's one Nextcloud account, the one Home
+ * holds ([HomeAccount]). Then only the choice is kept (who and the stamp last taken); the app
+ * password is asked of Home on each start, before each send and on each change notice, and kept
+ * in memory only. When Home signs out, or is gone, sending stops until it has the account again.
+ *
  * Everything here is one worker thread, never the main one, and a failure is only logged and
  * flagged: the log is never held up by a network.
  */
@@ -92,6 +101,9 @@ object DreamSync {
     private const val FOLDER = "folder"
     private const val ON = "on"
     private const val SENT = "sent:"
+    /** Home's account chosen: [HomeAccount.Held.who] (server and user), and the stamp last taken. */
+    private const val HOME_WHO = "home_who"
+    private const val HOME_STAMP = "home_stamp"
 
     private lateinit var app: Context
     private lateinit var prefs: SharedPreferences
@@ -100,6 +112,9 @@ object DreamSync {
     private val _state = MutableStateFlow(SyncState())
     val state: StateFlow<SyncState> = _state
     private var signingIn: Job? = null
+
+    /** Home's account as last asked, with its password: in memory only, never written down. */
+    @Volatile private var held: HomeAccount.Held? = null
 
     /** Counts sign-in tries, so a try that was cancelled while checking is dropped when it ends. */
     @Volatile private var attempt = 0
@@ -112,17 +127,50 @@ object DreamSync {
         if (::app.isInitialized) return
         app = context.applicationContext
         prefs = app.getSharedPreferences("nextcloud_sync", Context.MODE_PRIVATE)
-        val account = account()
-        _state.value = SyncState(
+        _state.value = signedIn(SyncState(folder = folder()))
+        scope.launch {
+            askHome()
+            Dreams.list.collect { if (_state.value.on) catchUp(it) }
+        }
+    }
+
+    /** [current] with who is signed in, and whether sending is on, as they are now. */
+    private fun signedIn(current: SyncState): SyncState {
+        val who = homeWho()
+        if (who != null) {
+            val out = homeStamp().isEmpty()
+            return current.copy(
+                user = if (out) null else who.substringAfter('\n'),
+                server = if (out) null else who.substringBefore('\n'),
+                on = !out && held != null && prefs.getBoolean(ON, false),
+                home = true,
+                homeOut = out,
+            )
+        }
+        val account = ownAccount()
+        return current.copy(
             user = account?.user,
             server = account?.server,
             on = account != null && prefs.getBoolean(ON, false),
-            folder = folder(),
+            home = false,
+            homeOut = false,
         )
-        scope.launch { Dreams.list.collect { if (_state.value.on) catchUp(it) } }
     }
 
+    private fun homeWho(): String? = prefs.getString(HOME_WHO, null)?.takeIf { it.isNotEmpty() }
+
+    private fun homeStamp(): String = prefs.getString(HOME_STAMP, null).orEmpty()
+
+    /** The account to send with: Home's while it is chosen, otherwise the one signed in here. */
     private fun account(): Account? {
+        if (homeWho() != null) {
+            if (homeStamp().isEmpty()) return null
+            return held?.let { Account(it.server, it.user, it.password) }
+        }
+        return ownAccount()
+    }
+
+    private fun ownAccount(): Account? {
         val server = prefs.getString(SERVER, null)?.takeIf { it.isNotBlank() } ?: return null
         val user = prefs.getString(USER, null)?.takeIf { it.isNotBlank() } ?: return null
         val password = Secrets.open(prefs.getString(PASSWORD, null)) ?: return null
@@ -131,9 +179,79 @@ object DreamSync {
 
     private fun folder(): String = prefs.getString(FOLDER, null)?.takeIf { it.isNotBlank() } ?: DEFAULT_FOLDER
 
-    /** When the app opens: anything that could not be sent last time is tried again. */
+    /**
+     * When the app opens: Home is asked again, if its account is chosen, and anything that could
+     * not be sent last time is tried again.
+     */
     fun syncNow() {
-        if (::app.isInitialized && _state.value.on) scope.launch { catchUp(Dreams.list.value) }
+        if (!::app.isInitialized) return
+        scope.launch {
+            askHome()
+            if (_state.value.on) catchUp(Dreams.list.value)
+        }
+    }
+
+    // Home's account ---------------------------------------------------------------------------
+
+    /** Home says its account changed: ask again, and send what waits if it is still there. */
+    fun homeChanged() = syncNow()
+
+    /**
+     * Asks Home, if its account is chosen, and does as [HomeAccount.follow] says. On the worker
+     * thread only: it asks another app.
+     */
+    @Synchronized
+    private fun askHome() {
+        val who = homeWho() ?: return
+        val stamp = homeStamp()
+        val answer = HomeAccount.ask(app)
+        when (val step = HomeAccount.follow(who, stamp, answer)) {
+            // The same account under the same stamp: the password is only needed in memory again.
+            is HomeAccount.Step.Keep -> if (answer is HomeAccount.Answer.Has && stamp.isNotEmpty()) held = answer.held
+            is HomeAccount.Step.Take -> {
+                held = step.held
+                prefs.edit().putString(HOME_STAMP, step.held.stamp).apply()
+            }
+            is HomeAccount.Step.Drop -> {
+                held = null
+                val edit = prefs.edit().putString(HOME_STAMP, "")
+                // Another account in Home: the choice goes too, and a press takes the new one.
+                if (!step.following) {
+                    edit.remove(HOME_WHO).putBoolean(ON, false)
+                    prefs.all.keys.filter { it.startsWith(SENT) }.forEach { edit.remove(it) }
+                }
+                edit.apply()
+            }
+        }
+        _state.update { signedIn(it).copy(behind = if (account() == null) false else it.behind) }
+    }
+
+    /**
+     * "Use the phone's Nextcloud account": Home's account takes the place of any signed in here,
+     * whose app password is deleted on the server as at Sign out. Sending starts off.
+     */
+    fun useHome() {
+        if (signingIn?.isActive == true) cancelSignIn()
+        scope.launch {
+            val answer = HomeAccount.ask(app) as? HomeAccount.Answer.Has ?: return@launch
+            val own = ownAccount()
+            held = answer.held
+            forgetSent()
+            prefs.edit().remove(SERVER).remove(USER).remove(PASSWORD)
+                .putString(HOME_WHO, answer.held.who).putString(HOME_STAMP, answer.held.stamp)
+                .putBoolean(ON, false).apply()
+            _state.update { signedIn(it).copy(typed = "", problem = null, behind = false, signIn = SignIn.IDLE) }
+            if (own != null) LoginFlow.revoke(own)
+        }
+    }
+
+    /** "Stop using it": Home's account is let go here (Home stays signed in) and the sign-in here is empty. */
+    fun stopHome() {
+        scope.launch {
+            held = null
+            prefs.edit().clear().apply()
+            _state.value = SyncState()
+        }
     }
 
     // Sending ------------------------------------------------------------------------------------
@@ -166,6 +284,9 @@ object DreamSync {
 
     @Synchronized
     private fun catchUp(dreams: List<Dream>) {
+        if (!_state.value.on) return
+        // Home is asked before every send: it may have signed out or changed its password.
+        askHome()
         if (!_state.value.on) return
         val account = account() ?: return
         try {
@@ -311,7 +432,8 @@ object DreamSync {
         }
         // Signing in sends nothing: the switch is the reader's to turn on.
         forgetSent()
-        prefs.edit().putString(SERVER, account.server).putString(USER, account.user)
+        held = null
+        prefs.edit().remove(HOME_WHO).remove(HOME_STAMP).putString(SERVER, account.server).putString(USER, account.user)
             .putString(PASSWORD, sealed).putBoolean(ON, false).apply()
         _state.update {
             it.copy(user = account.user, server = account.server, on = false, signIn = SignIn.IDLE, typed = "", behind = false)
@@ -324,7 +446,7 @@ object DreamSync {
      */
     fun signOut() {
         scope.launch {
-            val account = account()
+            val account = ownAccount()
             prefs.edit().clear().apply()
             _state.value = SyncState()
             if (account != null) LoginFlow.revoke(account)

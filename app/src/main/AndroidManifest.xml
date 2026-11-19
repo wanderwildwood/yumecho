@@ -23,7 +23,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <queries>
-        <!-- Home, whose dark mode switch this app follows when Home is installed. -->
+        <!-- Home, whose dark mode switch this app follows when Home is installed, and whose
+             Nextcloud account it can use instead of signing in itself (cloud/HomeAccount.kt). -->
         <package android:name="com.wanderwildwood.iori" />
         <!-- Browsers: a web address opens in a real one, never in the system's bare WebView shell. -->
         <intent>

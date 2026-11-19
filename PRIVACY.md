@@ -122,6 +122,13 @@ Signing in alone sends nothing.
   password is never typed into the app; Nextcloud hands the phone an app password of its own,
   which you can revoke in Nextcloud's security settings. A phone with no browser can be given
   an app password by hand.
+- **Or Home's account:** if Home (the launcher) is signed in to Nextcloud and lists this app,
+  "Use the phone's Nextcloud account" uses that account instead. Only Home itself is asked: the
+  app first checks that the answering app is Home by its package name and the certificate it is
+  signed with (`cloud/HomeAccount.kt`). The app keeps only which account it chose and nothing of
+  the password, which it asks Home for again on each start, before each send and when Home says
+  it changed, and holds in memory only. When Home signs out, or is removed, this app is signed
+  out too and sends nothing.
 - **Kept on the phone:** the server, login name and app password, in the app's private
   preferences, with the password sealed (AES-GCM) by a key in the Android Keystore that cannot
   be exported and is not backed up (`cloud/Secrets.kt`). If that key is lost the app behaves as

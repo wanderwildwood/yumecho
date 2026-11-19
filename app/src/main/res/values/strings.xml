@@ -220,6 +220,13 @@
     <string name="nc_save">Save</string>
     <string name="nc_show_key">Show the key</string>
     <string name="nc_hide_key">Hide the key</string>
+    <!-- The phone's one Nextcloud account, held by Home (shared-homeaccount). -->
+    <string name="home_account_use">Use the phone\'s Nextcloud account</string>
+    <string name="home_account_in_use">%1$s on %2$s, from Home.</string>
+    <string name="home_account_stop">Stop using it</string>
+    <string name="home_account_signed_out">Home is signed out of Nextcloud, so this app is too. Your %1$s stay on the phone.</string>
+    <string name="home_account_what">dreams</string>
+    <string name="nc_home_stop_note">Stops sending and lets Home\'s account go here. Home stays signed in, and copies already in Nextcloud stay.</string>
 
     <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
