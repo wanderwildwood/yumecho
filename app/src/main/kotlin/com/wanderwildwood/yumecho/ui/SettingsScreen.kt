@@ -79,6 +79,8 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var asking by remember { mutableStateOf(false) }
     var refused by remember { mutableStateOf<InNotes.Answer?>(null) }
     val context = LocalContext.current
+    // Memo's row is for a reader who has Memo, or whose switch is still on so it can be turned off.
+    val memoHere = remember { HouseApps.isReal(context, HouseApps.MEMO) }
     var duraSpeedRisk by remember { mutableStateOf(DuraSpeed.atRisk(context)) }
     fun open(intent: android.content.Intent) = runCatching {
         context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -173,7 +175,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     Spacer(Modifier.height(12.dp))
                 }
             }
-            item {
+            if (memoHere || on) item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
