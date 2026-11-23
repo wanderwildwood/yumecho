@@ -54,11 +54,14 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
             )
         },
     ) { contentPadding ->
+        val fit = rememberWholeLineFit()
+        val body = MaterialTheme.typography.bodyLarge
         PagedColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .wholeLinePage(fit),
             showCutRow = true,
         ) {
             item {
@@ -72,15 +75,16 @@ fun DreamScreen(dream: Dream, hearing: String?, onClose: () -> Unit, onDelete: (
             if (text.isNullOrEmpty()) {
                 item { TextMMD(text = words(dream, hearing), style = MaterialTheme.typography.bodyLarge) }
             } else {
-                for (paragraph in paragraphs(text)) {
-                    item {
+                paragraphs(text).forEachIndexed { n, paragraph ->
+                    // A paragraph taller than the page is cut into rows of whole lines.
+                    wholeLineItems("p$n", paragraph, body, fit, gap = 10.dp) { run, _, textModifier ->
                         // Selectable, with Define and the rest behind the menu's ⋮: a word the
                         // phone heard oddly is often one worth looking up.
                         SelectionContainer(modifier = Modifier.textActions()) {
                             TextMMD(
-                                text = paragraph,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(bottom = 10.dp),
+                                text = run,
+                                style = body,
+                                modifier = Modifier.padding(bottom = 10.dp).then(textModifier),
                             )
                         }
                     }
