@@ -97,7 +97,9 @@ None of these is a permission. The manifest's `<queries>` lets the app see, on t
 
 - **Memo** (`com.wanderwildwood.oboegaki`), for "Keep dreams in Memo" above.
 - **Home** (`com.wanderwildwood.iori`), whose dark mode switch the app follows when Home is
-  installed: it reads that one on/off answer from Home's provider, and nothing else.
+  installed: it reads that one on/off answer from Home's provider. If you choose "Use the
+  phone's Nextcloud account", it also asks Home which Nextcloud account it is signed in to, and
+  for that account's app password when it sends (see Your own Nextcloud). Nothing else.
 - **Files (Cabinet)** (`com.wanderwildwood.tana`), which, when installed, answers "save a file"
   and "open a file" for backup, restore and export with its own screens.
 - **Browsers**, so a web address (the About's links) opens in a real browser.
@@ -138,7 +140,10 @@ Signing in alone sends nothing.
   the app, so that a notes app, a text editor or a new phone can read them.
 - **Deleting:** with sending on, deleting a dream deletes its copy on the server. Turning
   sending off, or signing out, leaves the copies already there. Signing out also deletes the
-  app password on the server.
+  app password on the server, when it is one this app made for itself. With "Use the phone's
+  Nextcloud account" the password is Home's: "Stop using it" lets the account go here, deletes
+  nothing on the server and leaves Home signed in; and choosing Home's account deletes the app
+  password this app had made for itself before.
 - **Calls:** `PROPFIND`, `MKCOL`, `PUT` and `DELETE` on `remote.php/dav/files/<you>/<folder>/`,
   and Login Flow v2's `index.php/login/v2` and `ocs/v2.php/core/apppassword`.
 
