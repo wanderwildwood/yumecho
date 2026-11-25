@@ -76,6 +76,29 @@ object Speech {
         if (::app.isInitialized) return
         app = context.applicationContext
         _chosen.value = prefs.getString(LANGUAGE, null) ?: "en"
+        _declined.value = prefs.getString(DECLINED, null)
+    }
+
+    private val _declined = MutableStateFlow<String?>(null)
+
+    /** The phone language whose offer was answered "Not now", so it is not made again. */
+    val declined: StateFlow<String?> = _declined
+
+    /**
+     * The phone's own language, when it is one offered here. Norwegian phones say "nb" or "nn"
+     * where Whisper says "no".
+     */
+    fun phoneLanguage(context: Context): Language? {
+        val code = context.resources.configuration.locales[0].language.let {
+            if (it == "nb" || it == "nn") "no" else it
+        }
+        return languages.firstOrNull { it.code == code }
+    }
+
+    /** Not now, for this phone language. Settings can still change the language any time. */
+    fun decline(language: String) {
+        prefs.edit().putString(DECLINED, language).apply()
+        _declined.value = language
     }
 
     private fun keep(language: String) {
@@ -202,6 +225,7 @@ object Speech {
     internal fun hex(bytes: ByteArray): String = bytes.joinToString("") { "%02x".format(it) }
 
     private const val LANGUAGE = "language"
+    private const val DECLINED = "declined_offer"
     private const val MODEL_NAME = "ggml-base-q5_1.bin"
     private const val MODEL_BYTES = 59_707_625L
     private const val MODEL_SHA256 = "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898"

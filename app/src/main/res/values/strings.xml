@@ -147,6 +147,12 @@
     <string name="speech_cancel">Cancel</string>
     <string name="speech_download">Download (60 MB)</string>
     <string name="speech_ask">Download the model for %1$s?</string>
+    <!-- On the main screen, only when the phone's language differs from the one dreams are heard in: "Dreams are heard in English. This phone is set to Polski." -->
+    <string name="offer_text">Dreams are heard in %1$s. This phone is set to %2$s.</string>
+    <string name="offer_yes">Hear in %1$s</string>
+    <string name="offer_no">Not now</string>
+    <string name="offer_note">Hearing in a language other than English downloads a listening model once, about 60 MB. Settings can change it any time.</string>
+    <string name="offer_stop">Stop</string>
     <!-- ============================================================ -->
     <!-- Settings > Nextcloud: keeping the words in the reader's own Nextcloud -->
 

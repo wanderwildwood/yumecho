@@ -74,6 +74,10 @@ fun LogScreen(
                 Arming(night, micAllowed, micRefused, onArm, onDisarm)
                 Spacer(Modifier.height(16.dp))
                 DottedRule(start = 0.dp, end = 0.dp)
+                // Not at night: armed, the screen is for disarming and nothing else.
+                if (night == Night.State.RESTING) {
+                    LanguageOffer(Modifier.padding(top = 16.dp))
+                }
 
                 if (dreams.isEmpty()) {
                     Spacer(Modifier.height(16.dp))
